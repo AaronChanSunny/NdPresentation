@@ -24,11 +24,11 @@ Android 会尽可能长时间的保留应用进程，保证用户下次回到应
 
 ### 为什么选择 Fragment？
 
+- 与 ViewPager 搭配使用
 - 更轻（页面切换速度）
 - 需要适配大屏
 - FragmentDialog
 - RetainFragment 转屏保存数据
-- 
 
 代价，复杂度更高。生命周期复杂；不明所以的异常；原则，根据业务决定是否采用 Fragment。
 
