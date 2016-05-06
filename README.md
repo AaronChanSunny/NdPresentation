@@ -34,7 +34,7 @@ Android 会尽可能长时间的保留应用进程，保证用户下次回到应
 
 ## 参考
 
-[Don't Store Data in the Application Object](http://www.developerphil.com/dont-store-data-in-the-application-object/)
-[Android development: What I wish I had known earlier](http://balpha.de/2013/07/android-development-what-i-wish-i-had-known-earlier/)
-[Fragment Transactions & Activity State Loss](http://www.androiddesignpatterns.com/2013/08/fragment-transaction-commit-state-loss.html)
-[进程和线程](http://developer.android.com/intl/zh-cn/guide/components/processes-and-threads.html)
+- [Don't Store Data in the Application Object](http://www.developerphil.com/dont-store-data-in-the-application-object/)
+- [Android development: What I wish I had known earlier](http://balpha.de/2013/07/android-development-what-i-wish-i-had-known-earlier/)
+- [Fragment Transactions & Activity State Loss](http://www.androiddesignpatterns.com/2013/08/fragment-transaction-commit-state-loss.html)
+- [进程和线程](http://developer.android.com/intl/zh-cn/guide/components/processes-and-threads.html)
