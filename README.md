@@ -35,8 +35,7 @@ java.lang.RuntimeException: Can't create handler inside thread that has not call
 ```
 
 那么，HandlerThread 和普通的 Thread 有什么区别呢？其实它们之间的区间就在于 HandlerThread 是一个带有消息循环 Looper 的
-Thread。换句话说，我们可以在 HandlerThread 中直接创建 Handler。一起看看 HandlerThread 具体是怎么是实现的，关键在 HandlerThread#run
-() 方法：
+Thread。换句话说，我们可以在 HandlerThread 中直接创建 Handler。一起看看 HandlerThread 具体是怎么是实现的，关键在 HandlerThread#run() 方法：
 
 ```
 @Override
@@ -57,7 +56,7 @@ public void run() {
 在 HandlerThread#run() 方法里，首先使用 Looper.prepare() 初始化消息循环 Looper，通过 onLooperPrepared() 通知外界，Looper
 初始化完成，然后就直接开启消息循环 Looper.loop()。所以，之所以我们能够在 HandlerThread 中创建 Handler，是因为 HandlerThread
 已经默认为我们创建并开启了一个消息循环。这和 Android 主线程 [ActivityThread](https://github
-.com/android/platform_frameworks_base/blob/master/core/java/android/app/ActivityThread.java#5472)
+.com/android/platform_frameworks_base/blob/master/core/java/android/app/ActivityThread.java#L5472)
 的情况是类似的。
 
 ### IntentService 
