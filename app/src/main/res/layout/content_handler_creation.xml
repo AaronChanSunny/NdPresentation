@@ -13,4 +13,11 @@
     tools:context="me.aaronchan.ndpresentation.HandlerCreationActivity"
     tools:showIn="@layout/activity_handler_creation">
 
+    <Button
+        android:id="@+id/btn_create"
+        android:text="@string/btn_create_simple_thread"
+        android:textAllCaps="false"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
 </RelativeLayout>

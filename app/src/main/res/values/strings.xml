@@ -1,5 +1,7 @@
 <resources>
     <string name="app_name">Nd Presentation</string>
     <string name="action_settings">Settings</string>
+
     <string name="title_activity_handler_creation">HandlerCreationActivity</string>
+    <string name="btn_create_simple_thread">Create a Simple Thread</string>
 </resources>
