@@ -24,10 +24,18 @@
             android:label="@string/title_activity_handler_creation"
             android:parentActivityName=".MainActivity"
             android:theme="@style/AppTheme.NoActionBar">
-
             <meta-data
                 android:name="android.support.PARENT_ACTIVITy"
                 android:value=".MainActivity"/>
+        </activity>
+        <activity
+            android:name=".HandlerThreadActivity"
+            android:label="@string/title_activity_handler_thread"
+            android:parentActivityName=".MainActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="me.aaronchan.ndpresentation.MainActivity"/>
         </activity>
     </application>
 

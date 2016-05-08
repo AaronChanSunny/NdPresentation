@@ -75,8 +75,14 @@ public class MainActivity extends AppCompatActivity {
         mItems = new ArrayList<>();
 
         mItems.add(new Item(true, "Android Async Framework"));
-        mItems.add(new Item(false, "Handler Without Looper", "Create handler in thread without " +
-                "looper throw exception.", HandlerCreationActivity.class));
+        mItems.add(new Item(false,
+                "Handler Without Looper",
+                "Create handler in thread without " + "looper throw exception.",
+                HandlerCreationActivity.class));
+        mItems.add(new Item(false,
+                "HandlerThread Sample",
+                "A simple HandlerThread example.",
+                HandlerThreadActivity.class));
 
         mAdapter = new ItemAdapter(mItems);
     }
