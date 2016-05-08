@@ -1,7 +1,7 @@
 # ND Presentation
 
 ## 为什么要阅读源码
-
+presentation-list.xmind
 - 知其然，知其所以然。了解底层，更好地服务上层。
 - 优秀的代码风格和设计理念。作为编码准则，尽量模仿，缩小差距。
 - 了解 Android 设计者的意图。
