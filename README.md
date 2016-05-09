@@ -99,7 +99,7 @@ public void run() {
 
 ### IntentService 
 
-`IntentService` 是一个 `Service` 子类，其内部有一个工作线程用来处理异步任务，当异步任务结束后 `IntentService` 会自动停止。通常情况用在应用后台数据下载。
+`IntentService` 是一个 `Service` 子类，其内部有一个工作线程用来逐一处理异步任务，当异步任务结束后 `IntentService` 会自动停止。通常情况用在应用后台数据下载。
 
 ![](screenshots/intentservice.png)
 
