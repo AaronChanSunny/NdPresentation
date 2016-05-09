@@ -52,6 +52,7 @@ public class ItemAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         } else {
             HeaderViewHolder headerHolder = (HeaderViewHolder) holder;
 
+            headerHolder.mDivider.setVisibility(position == 0 ? View.GONE : View.VISIBLE);
             headerHolder.mHeader.setText(item.getTitle());
         }
     }
@@ -69,11 +70,13 @@ public class ItemAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     class HeaderViewHolder extends RecyclerView.ViewHolder {
 
         TextView mHeader;
+        View mDivider;
 
         public HeaderViewHolder(View itemView) {
             super(itemView);
 
             mHeader = (TextView) itemView.findViewById(R.id.tv_header);
+            mDivider = itemView.findViewById(R.id.divider);
         }
     }
 
