@@ -168,18 +168,18 @@ public void onStart(Intent intent, int startId) {
 运行示例代码，可以发现，`IntentService` 只能以序列化的方式处理异步任务，并且只有当处理完所有的 `Intent` 之后，才会销毁服务：
 
 ```
-05-09 08:23:11.541 28619-28619/me.aaronchan.ndpresentation D/SimpleService: onCreate
-05-09 08:23:11.541 28619-28619/me.aaronchan.ndpresentation D/SimpleService: onStartCommand
-05-09 08:23:11.542 28619-28619/me.aaronchan.ndpresentation D/SimpleService: onStartCommand
-05-09 08:23:11.543 28619-28619/me.aaronchan.ndpresentation D/SimpleService: onStartCommand
-05-09 08:23:11.543 28619-28619/me.aaronchan.ndpresentation D/SimpleService: onStartCommand
-05-09 08:23:11.544 28619-28619/me.aaronchan.ndpresentation D/SimpleService: onStartCommand
-05-09 08:23:13.544 28619-28964/me.aaronchan.ndpresentation D/SimpleService: Task in IntentService[SimpleService] done.
-05-09 08:23:15.546 28619-28964/me.aaronchan.ndpresentation D/SimpleService: Task in IntentService[SimpleService] done.
-05-09 08:23:17.547 28619-28964/me.aaronchan.ndpresentation D/SimpleService: Task in IntentService[SimpleService] done.
-05-09 08:23:19.548 28619-28964/me.aaronchan.ndpresentation D/SimpleService: Task in IntentService[SimpleService] done.
-05-09 08:23:21.549 28619-28964/me.aaronchan.ndpresentation D/SimpleService: Task in IntentService[SimpleService] done.
-05-09 08:23:21.549 28619-28619/me.aaronchan.ndpresentation D/SimpleService: onDestroy
+05-09 08:36:15.989 7277-7277/me.aaronchan.ndpresentation D/SimpleService: onCreate
+05-09 08:36:15.989 7277-7277/me.aaronchan.ndpresentation D/SimpleService: onStartCommand
+05-09 08:36:15.989 7277-7277/me.aaronchan.ndpresentation D/SimpleService: onStartCommand
+05-09 08:36:15.989 7277-7277/me.aaronchan.ndpresentation D/SimpleService: onStartCommand
+05-09 08:36:15.990 7277-7277/me.aaronchan.ndpresentation D/SimpleService: onStartCommand
+05-09 08:36:16.010 7277-7277/me.aaronchan.ndpresentation D/SimpleService: onStartCommand
+05-09 08:36:18.011 7277-8597/me.aaronchan.ndpresentation D/SimpleService: Task in IntentService[SimpleService] #0 done.
+05-09 08:36:20.012 7277-8597/me.aaronchan.ndpresentation D/SimpleService: Task in IntentService[SimpleService] #1 done.
+05-09 08:36:22.013 7277-8597/me.aaronchan.ndpresentation D/SimpleService: Task in IntentService[SimpleService] #2 done.
+05-09 08:36:24.014 7277-8597/me.aaronchan.ndpresentation D/SimpleService: Task in IntentService[SimpleService] #3 done.
+05-09 08:36:26.015 7277-8597/me.aaronchan.ndpresentation D/SimpleService: Task in IntentService[SimpleService] #4 done.
+05-09 08:36:26.015 7277-7277/me.aaronchan.ndpresentation D/SimpleService: onDestroy
 ```
 
 ## 为什么要阅读源码
