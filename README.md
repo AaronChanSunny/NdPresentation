@@ -99,6 +99,66 @@ public void run() {
 
 ### IntentService 
 
+`IntentService` 是一个 `Service` 子类，其内部有一个工作线程用来处理异步任务，当异步任务结束后 `IntentService` 会自动停止。通常情况用在应用后台数据下载。当然，我们也可以直接开一个工作线程完成上述任务，`IntentService` 的优势在哪里呢？在 Andriod 中，进程按照重要程度可以分为以下5个等级：
+
+1. 前台进程（可见可交互）
+2. 可见进程（可见不可交互）
+3. 服务进程
+4. 后台进程
+5. 空进程
+
+Android 系统将尽量长时间地保持应用进程，但是当系统资源不足时，Android 就会按照上述优先级，从低到高依次回收进程，释放系统资源以确保高优先级进程的正常运行。
+ 
+这里需要补充一点，一个进程的优先级是由该进程内的所有线程的最高优先级确定的。`IntentService` 归根到底是四大组件之一 `Service`，因此在系统资源优先级上要高于普通的工作线程，因此如果使用 `IntentService` 可以提高整个应用进程的优先级。如果应用中的某些数据比较重要，开发者不希望后台在下载这些数据时线程被回收，可以考虑使用 `IntentService` 来提高后台任务的优先级。
+
+其实 Android 的四大组件都是运行在主线程的，`Service` 同样也是。那么，`IntentService` 的内部是如何工作的呢？它是怎么让 `Service` 具有完成异步任务的功能？其实，`IntentService` 内部非常重要的一个角色就是之前介绍的 `HandlerThread`。首先，我们看看 `IntentService#onCreate()` 方法：
+
+```
+@Override
+public void onCreate() {
+    // TODO: It would be nice to have an option to hold a partial wakelock
+    // during processing, and to have a static startService(Context, Intent)
+    // method that would launch the service & hand off a wakelock.
+    super.onCreate();
+    HandlerThread thread = new HandlerThread("IntentService[" + mName + "]");
+    thread.start();
+    mServiceLooper = thread.getLooper();
+    mServiceHandler = new ServiceHandler(mServiceLooper);
+}
+```
+
+在 `IntentService#onCreate()` 方法里做了3件事情：
+
+- 创建了一个 `HandlerThread` 线程，作为工作线程
+- 启动 `HandlerThread` 线程
+- 通过 `HandlerThread` 的 `Looper` 创建 `mServiceHandler`
+
+上述步骤结束后，我们就得到了一个 `Handler` 对象 `mServiceHandler`，通过它发送的消息都会在工作线程中进行处理。接下来，看看 `IntentService` 的几个主要生命周期方法都做了什么？启动服务 `onStartCommand()` 方法：
+
+```
+@Override
+public int onStartCommand(Intent intent, int flags, int startId) {
+    onStart(intent, startId);
+    return mRedelivery ? START_REDELIVER_INTENT : START_NOT_STICKY;
+}
+```
+
+这边是直接调用 `onStart()` 方法，跳转到 `onStart()` 方法：
+
+```
+@Override
+public void onStart(Intent intent, int startId) {
+    Message msg = mServiceHandler.obtainMessage();
+    msg.arg1 = startId;
+    msg.obj = intent;
+    mServiceHandler.sendMessage(msg);
+}
+```
+
+到这一步就很清楚了，当我们开始 `IntentService` 时，我们会将外部传进来的 `Intent` 对象作为 `Message` 的 `obj`，并通过 `mServiceHandler` 发送消息。这里还需要传递一个参数 `startId`，`IntentService` 之所以可以在异步任务结束后自动停止，就是要根据这个参数调用 `Service#stopSelf()`。
+
+当 `mServiceHandler` 从工作线程的消息队列取出消息后，会调用 `IntentService#onHandleIntent()` 抽象方法，异步任务的具体操作逻辑都在这里。
+
 ## 为什么要阅读源码
 
 - 知其然，知其所以然。了解底层，更好地服务上层。
