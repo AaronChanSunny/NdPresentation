@@ -1,4 +1,4 @@
-package me.aaronchan.ndpresentation;
+package me.aaronchan.ndpresentation.activity;
 
 import android.os.Bundle;
 import android.os.Handler;
@@ -8,6 +8,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
+
+import me.aaronchan.ndpresentation.R;
 
 public class HandlerCreationActivity extends AppCompatActivity {
 

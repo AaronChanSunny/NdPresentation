@@ -1,4 +1,4 @@
-package me.aaronchan.ndpresentation;
+package me.aaronchan.ndpresentation.model;
 
 public class Item {
     private boolean mIsHeader;

@@ -1,4 +1,4 @@
-package me.aaronchan.ndpresentation;
+package me.aaronchan.ndpresentation.activity;
 
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -7,12 +7,14 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 
-public class IntentServiceActivity extends AppCompatActivity {
+import me.aaronchan.ndpresentation.R;
+
+public class TouchConsumedActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_intent_service);
+        setContentView(R.layout.activity_touch_consumed);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -25,17 +27,6 @@ public class IntentServiceActivity extends AppCompatActivity {
             }
         });
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
-        findViewById(R.id.btn_start).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                SimpleService.actionStart(IntentServiceActivity.this, "#0");
-                SimpleService.actionStart(IntentServiceActivity.this, "#1");
-                SimpleService.actionStart(IntentServiceActivity.this, "#2");
-                SimpleService.actionStart(IntentServiceActivity.this, "#3");
-                SimpleService.actionStart(IntentServiceActivity.this, "#4");
-            }
-        });
     }
 
 }

@@ -1,4 +1,4 @@
-package me.aaronchan.ndpresentation;
+package me.aaronchan.ndpresentation.activity;
 
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -7,12 +7,16 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import me.aaronchan.ndpresentation.R;
+import me.aaronchan.ndpresentation.adapter.ItemAdapter;
+import me.aaronchan.ndpresentation.model.Item;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -91,6 +95,19 @@ public class MainActivity extends AppCompatActivity {
                 "IntentService Sample",
                 "A intent service example.",
                 IntentServiceActivity.class));
+        mItems.add(new Item(true, "Android Touch System"));
+        mItems.add(new Item(false,
+                "Touch Event Ignore",
+                "A text view in frame layout.",
+                TouchIgnoreActivity.class));
+        mItems.add(new Item(false,
+                "Touch Event Consumed",
+                "A button in frame layout.",
+                TouchConsumedActivity.class));
+        mItems.add(new Item(false,
+                "Touch Event Intercepted",
+                "A button in scroll view.",
+                TouchInterceptedActivity.class));
 
         mAdapter = new ItemAdapter(mItems);
     }

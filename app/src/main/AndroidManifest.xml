@@ -9,7 +9,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".MainActivity"
+            android:name=".activity.MainActivity"
             android:label="@string/app_name"
             android:launchMode="singleTop"
             android:theme="@style/AppTheme.NoActionBar">
@@ -20,43 +20,71 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".HandlerCreationActivity"
+            android:name=".activity.HandlerCreationActivity"
             android:label="@string/title_activity_handler_creation"
-            android:parentActivityName=".MainActivity"
+            android:parentActivityName=".activity.MainActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITy"
                 android:value=".MainActivity"/>
         </activity>
         <activity
-            android:name=".HandlerThreadActivity"
+            android:name=".activity.HandlerThreadActivity"
             android:label="@string/title_activity_handler_thread"
-            android:parentActivityName=".MainActivity"
+            android:parentActivityName=".activity.MainActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="me.aaronchan.ndpresentation.MainActivity"/>
+                android:value=".activity.MainActivity"/>
         </activity>
         <activity
-            android:name=".AsyncTaskActivity"
+            android:name=".activity.AsyncTaskActivity"
             android:label="@string/title_activity_async_task"
-            android:parentActivityName=".MainActivity"
+            android:parentActivityName=".activity.MainActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="me.aaronchan.ndpresentation.MainActivity"/>
+                android:value=".activity.MainActivity"/>
         </activity>
         <activity
-            android:name=".IntentServiceActivity"
+            android:name=".activity.IntentServiceActivity"
             android:label="@string/title_activity_intent_service"
-            android:parentActivityName=".MainActivity"
+            android:parentActivityName=".activity.MainActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="me.aaronchan.ndpresentation.MainActivity"/>
+                android:value=".activity.MainActivity"/>
         </activity>
 
-        <service android:name=".SimpleService"/>
+        <service android:name=".service.SimpleService"/>
+
+        <activity
+            android:name=".activity.TouchIgnoreActivity"
+            android:label="@string/title_activity_touch_ignore"
+            android:parentActivityName=".activity.MainActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activity.MainActivity"/>
+        </activity>
+        <activity
+            android:name=".activity.TouchConsumedActivity"
+            android:label="@string/title_activity_touch_consumed"
+            android:parentActivityName=".activity.MainActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activity.MainActivity"/>
+        </activity>
+        <activity
+            android:name=".activity.TouchInterceptedActivity"
+            android:label="@string/title_activity_touch_intercepted"
+            android:parentActivityName=".activity.MainActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activity.MainActivity"/>
+        </activity>
     </application>
 
 </manifest>

@@ -1,4 +1,4 @@
-package me.aaronchan.ndpresentation;
+package me.aaronchan.ndpresentation.adapter;
 
 import android.content.Context;
 import android.content.Intent;
@@ -9,6 +9,9 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import java.util.List;
+
+import me.aaronchan.ndpresentation.model.Item;
+import me.aaronchan.ndpresentation.R;
 
 /**
  * Created by aaronchan on 16/5/8.

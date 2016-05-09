@@ -11,4 +11,7 @@
     <string name="btn_launch_tasks">Launch Tasks</string>
     <string name="title_activity_intent_service">IntentServiceActivity</string>
     <string name="btn_start_service">Start Service</string>
+    <string name="title_activity_touch_ignore">TouchIgnoreActivity</string>
+    <string name="title_activity_touch_consumed">TouchConsumedActivity</string>
+    <string name="title_activity_touch_intercepted">TouchInterceptedActivity</string>
 </resources>

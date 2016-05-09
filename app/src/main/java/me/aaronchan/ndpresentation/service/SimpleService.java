@@ -1,4 +1,4 @@
-package me.aaronchan.ndpresentation;
+package me.aaronchan.ndpresentation.service;
 
 import android.app.IntentService;
 import android.content.Context;

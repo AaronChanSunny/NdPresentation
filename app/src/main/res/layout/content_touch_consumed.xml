@@ -10,14 +10,7 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context=".activity.AsyncTaskActivity"
-    tools:showIn="@layout/activity_async_task">
-
-    <Button
-        android:id="@+id/btn_launch_task"
-        android:layout_width="match_parent"
-        style="@style/CustomButton"
-        android:layout_height="wrap_content"
-        android:text="@string/btn_launch_tasks"/>
+    tools:context=".activity.TouchConsumedActivity"
+    tools:showIn="@layout/activity_touch_consumed">
 
 </RelativeLayout>

@@ -74,7 +74,7 @@ Process: me.aaronchan.ndpresentation, PID: 19566
 java.lang.RuntimeException: Can't create handler inside thread that has not called Looper.prepare()
     at android.os.Handler.<init>(Handler.java:200)
     at android.os.Handler.<init>(Handler.java:114)
-    at me.aaronchan.ndpresentation.HandlerCreationActivity$SimpleThread.run(HandlerCreationActivity.java:49)
+    at me.aaronchan.ndpresentation.activity.HandlerCreationActivity$SimpleThread.run(HandlerCreationActivity.java:49)
 ```
 
 那么，`HandlerThread` 和普通的 `Thread` 有什么区别呢？其实它们之间的区间就在于 `HandlerThread` 是一个带有消息循环 `Looper` 的 `Thread`。换句话说，我们可以在 `HandlerThread` 中直接创建 `Handler`。一起看看 `HandlerThread` 具体是怎么是实现的，关键在 `HandlerThread#run()` 方法：
