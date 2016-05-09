@@ -10,15 +10,15 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context="me.aaronchan.ndpresentation.HandlerCreationActivity"
-    tools:showIn="@layout/activity_handler_creation">
+    tools:context="me.aaronchan.ndpresentation.AsyncTaskActivity"
+    tools:showIn="@layout/activity_async_task">
 
     <Button
-        android:id="@+id/btn_create"
-        android:text="@string/btn_create_simple_thread"
+        android:id="@+id/btn_launch_task"
+        android:layout_width="match_parent"
         android:textAllCaps="false"
         style="@style/CustomButton"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content"
+        android:text="@string/btn_launch_tasks"/>
 
 </RelativeLayout>

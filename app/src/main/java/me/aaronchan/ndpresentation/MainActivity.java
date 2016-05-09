@@ -53,7 +53,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
+        // automatically handle clicks on the Home/Up selector_button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
@@ -83,6 +83,10 @@ public class MainActivity extends AppCompatActivity {
                 "HandlerThread Sample",
                 "A simple HandlerThread example.",
                 HandlerThreadActivity.class));
+        mItems.add(new Item(false,
+                "AsyncTask Sample",
+                "A async task example show serial tasks.",
+                AsyncTaskActivity.class));
 
         mAdapter = new ItemAdapter(mItems);
     }

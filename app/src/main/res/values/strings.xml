@@ -6,5 +6,7 @@
     <string name="title_activity_handler_thread">HandlerThreadActivity</string>
 
     <string name="btn_create_simple_thread">Create a Simple Thread</string>
-    <string name="btn_send_message">Send Worker Thread a Message.</string>
+    <string name="btn_send_message">Send Worker Thread a Message</string>
+    <string name="title_activity_async_task">AsyncTaskActivity</string>
+    <string name="btn_launch_tasks">Launch Tasks</string>
 </resources>

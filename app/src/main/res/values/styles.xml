@@ -6,6 +6,9 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+
+        <!--Customize selector_button color.-->
+        <item name="colorButtonNormal">@color/colorPrimary</item>
     </style>
 
     <style name="AppTheme.NoActionBar">
@@ -20,6 +23,10 @@
     <style name="RippleEffect">
         <item name="android:background">?android:attr/selectableItemBackground</item>
         <item name="android:clickable">true</item>
+    </style>
+
+    <style name="CustomButton" parent="Widget.AppCompat.Button">
+        <item name="android:textColor">@android:color/white</item>
     </style>
 
 </resources>
