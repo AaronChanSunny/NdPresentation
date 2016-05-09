@@ -173,3 +173,4 @@ public void onStart(Intent intent, int startId) {
 ## 参考
 
 - **Android** 开发艺术探索
+- [进程和线程](http://developer.android.com/intl/zh-cn/guide/components/processes-and-threads.html)
