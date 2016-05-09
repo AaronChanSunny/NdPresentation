@@ -182,6 +182,92 @@ public void onStart(Intent intent, int startId) {
 05-09 08:36:26.015 7277-7277/me.aaronchan.ndpresentation D/SimpleService: onDestroy
 ```
 
+## View 事件分发机制
+
+### 事件和事件序列（手势）
+
+在 Android 中，事件可以分为：
+
+- `ACTION_DOWN` 
+- `ACTION_UP` 
+- `ACTION_MOVE` 
+- `ACTION_POINTER_UP`
+- `ACTION_POINTER_DOWN`
+- `ACTION_CANCEL`
+
+事件序列总是从 `ACTION_DOWN` 开始，中间伴随着不定个数的 `ACTION_MOVE`，最终以 `ACTION_UP` 结束。要理解 Android 事件体系，需要从事件序列（或者称为手势）的角度去看待，每一个事件并不是孤立的个体，事件总是存在于某一个完成的事件序列中。
+
+### 几个重要方法
+
+事件分发过程由三个方法共同完成：dispatchTouchEvent、onInterceptTouchEvent 和 onTouchEvent。现在分别介绍如下：
+
+- public boolean dispatchTouchEvent(MotionEvent event)
+
+用来进行事件分发。如果事件能够传递到当前 View，此方法一定会被首先调用，返回值由当前 View 的 onTouchEvent 和子 View 的 dispatchTouchEvent 共同决定，表示是否消耗当前事件。
+
+- public boolean onInterceptTouchEvent(MotionEvent event)
+
+只有 ViewGroup 包含此方法，View 没有该方法。在 dispatchTouchEvent 内部调用，用来判断是否拦截某个事件，如果当前 View 拦截了某个事件，那么同一事件序列中，此方法不会被再次调用，返回结果表示是否拦截当前事件。
+
+- public boolean onTouchEvent(MotionEvent event)
+
+同样在 dispatchTouchEvent 内部调用，用来处理点击事件，返回结果表示是否消耗当前事件。如果不消耗，在同一事件序列中，当前 View 无法再次接收到事件。
+
+### 分发伪代码
+
+`ViewGroup` 的事件分发和 `View` 相比要复杂的多，这里以 `ViewGroup` 的事件分发源码举例说明。`ViewGroup` 的 `ViewGroup#dispatchTouchEvent()` 方法很长，但是核心处理流程可以用如下伪代码总结：
+
+```
+public boolean dispatchTouchEvent(MotionEvent event) {
+    boolean consumed = false;
+    if (onInterceptTouchEvent(event)) {
+        consumed = onTouchEvent(event);
+    } else {
+        consumed = child.dispatchTouchEvent(event);
+    }
+
+    return consumed;
+}
+```
+
+当一个事件能够传递到当前 `ViewGroup`，那么它的 `dispatchTouchEvent()` 方法一定会被调用。在 `dispatchTouchEvent()` 内部，首先会判断当前 `ViewGroup` 是否要拦截这个事件，如果拦截，即 `onInterceptTouchEvent()` 返回 `true`，则事件交给当前 `ViewGroup` 处理，即 `ViewGroup#onTouchEvent()` 将被调用，事件停止往下分发；如果 `ViewGroup` 不拦截这个事件，那么将调用 `child.dispatchTouchEvent()` 方法，即事件将传递给能接收到该事件的子 `View`，子 `View` 的事件分发过程类似。
+
+### 常见的事件分发场景
+
+1. 所有的 `View` 都没有消费事件
+
+![](screenshots/touch-ignore.jpg)
+
+2. 子 `View` 消费事件
+
+![](screenshots/touch-consumed.jpg) 
+
+3. 父 `View` 拦截事件
+
+![](screenshots/touch-intercepted.jpg) 
+
+### 几个结论
+
+- 同一个事件序列是指从手指接触屏幕的那一刻起，到手指离开屏幕的那一刻结束。在这个过程中所产生的一系列事件，这个事件序列以 down 事件开始，中间含有数量不定的 move 事件，最终以 up 结束。
+- 正常情况下，一个事件序列只能被一个 View 拦截并且消耗。只要一个 View 拦截了某一事件，那么同一事件序列内的所有事件都会交给它处理。
+- 某个 View 一旦决定拦截，那么这一事件序列都只能由它来处理，并且它的 onInterceptTouchEvent 将不会被再调用。
+- 某个 View 一旦开始处理事件，如果它不消耗 ACTION_DOWN 事件，那么同一事件序列的其他事件都不会再交给它处理，并且事件将重新交给它的父容器去处理，即父容器的 onTouchEvent 会被调用。
+- 如果 View 不消耗除 ACTION_DOWN 以外的其他事件，这个点击事件会消失，此时父容器的 onTouchEvent 并不会被调用，并且当前 View 可以持续收到后续事件，最终这些消失的点击事件会传递给 Activity 处理。
+- ViewGroup 默认不拦截任何事件。
+- View 没有 onInterceptTouchEvent 方法，一旦有点击事件传递给它，它的 onTouchEvent 就会被调用。
+- View 的 onTouchEvent 默认都会消耗事件，除非它是不可点击的，所谓不可点击是 clickable 和 longClickable 同时为 false。需要注意的是 View 的 longClickable 默认为 false；而 clickable 要分情况，比如 Button 默认为 true，而 TextView 默认为 false。
+- View 的 enabled 属性不影响 onTouchEvent 的默认返回值。
+- onClick 会触发的前提是当前 View 是可点击的，并且它收到了 down 和 up 事件。
+- 事件传递的顺序是由外向内的，即事件总是先传递给父容器，然后再由父容器分发给子 View。但是通过 requestDisallowInterceptTouchEvent 方法可以在子 View 干预父容器的事件分发，ACTION_DOWN 除外。这点是处理滑动冲突，内部拦截法的基础。
+
+### 解决滑动冲突
+
+- 同时水平滑动
+- 一个水平滑动、一个竖直滑动
+- 上述两种情况嵌套
+
+### 一个例子
+
 ## 为什么要阅读源码
 
 - Andriod 是完全开源的
@@ -194,3 +280,4 @@ public void onStart(Intent intent, int startId) {
 
 - **Android** 开发艺术探索
 - [进程和线程](http://developer.android.com/intl/zh-cn/guide/components/processes-and-threads.html)
+- [Mastering	the	Android Touch	System](http://files.cnblogs.com/files/sunzn/PRE_andevcon_mastering-the-android-touch-system.pdf)
