@@ -9,4 +9,6 @@
     <string name="btn_send_message">Send Worker Thread a Message</string>
     <string name="title_activity_async_task">AsyncTaskActivity</string>
     <string name="btn_launch_tasks">Launch Tasks</string>
+    <string name="title_activity_intent_service">IntentServiceActivity</string>
+    <string name="btn_start_service">Start Service</string>
 </resources>

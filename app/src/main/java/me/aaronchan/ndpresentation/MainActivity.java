@@ -87,6 +87,10 @@ public class MainActivity extends AppCompatActivity {
                 "AsyncTask Sample",
                 "A async task example show serial tasks.",
                 AsyncTaskActivity.class));
+        mItems.add(new Item(false,
+                "IntentService Sample",
+                "A intent service example.",
+                IntentServiceActivity.class));
 
         mAdapter = new ItemAdapter(mItems);
     }

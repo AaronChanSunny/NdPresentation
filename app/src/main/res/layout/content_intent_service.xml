@@ -10,14 +10,13 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context="me.aaronchan.ndpresentation.AsyncTaskActivity"
-    tools:showIn="@layout/activity_async_task">
+    tools:context="me.aaronchan.ndpresentation.IntentServiceActivity"
+    tools:showIn="@layout/activity_intent_service">
 
     <Button
-        android:id="@+id/btn_launch_task"
-        android:layout_width="match_parent"
+        android:id="@+id/btn_start"
         style="@style/CustomButton"
-        android:layout_height="wrap_content"
-        android:text="@string/btn_launch_tasks"/>
-
+        android:text="@string/btn_start_service"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
 </RelativeLayout>

@@ -26,6 +26,8 @@
     </style>
 
     <style name="CustomButton" parent="Widget.AppCompat.Button">
+        <item name="android:textAllCaps">false</item>
+        <item name="android:background">@drawable/selector_button</item>
         <item name="android:textColor">@android:color/white</item>
     </style>
 
