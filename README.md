@@ -163,12 +163,32 @@ public void onStart(Intent intent, int startId) {
 
 当 `mServiceHandler` 从工作线程的消息队列取出消息后，会调用 `IntentService#onHandleIntent()` 抽象方法，异步任务的具体操作逻辑都在这里。
 
+额外提一点，在使用 `IntentService` 时必须由子类显示调用其构造方法，传入的参数将作为工作线程的线程名称。
+
+运行示例代码，可以发现，`IntentService` 只能以序列化的方式处理异步任务，并且只有当处理完所有的 `Intent` 之后，才会销毁服务：
+
+```
+05-09 08:23:11.541 28619-28619/me.aaronchan.ndpresentation D/SimpleService: onCreate
+05-09 08:23:11.541 28619-28619/me.aaronchan.ndpresentation D/SimpleService: onStartCommand
+05-09 08:23:11.542 28619-28619/me.aaronchan.ndpresentation D/SimpleService: onStartCommand
+05-09 08:23:11.543 28619-28619/me.aaronchan.ndpresentation D/SimpleService: onStartCommand
+05-09 08:23:11.543 28619-28619/me.aaronchan.ndpresentation D/SimpleService: onStartCommand
+05-09 08:23:11.544 28619-28619/me.aaronchan.ndpresentation D/SimpleService: onStartCommand
+05-09 08:23:13.544 28619-28964/me.aaronchan.ndpresentation D/SimpleService: Task in IntentService[SimpleService] done.
+05-09 08:23:15.546 28619-28964/me.aaronchan.ndpresentation D/SimpleService: Task in IntentService[SimpleService] done.
+05-09 08:23:17.547 28619-28964/me.aaronchan.ndpresentation D/SimpleService: Task in IntentService[SimpleService] done.
+05-09 08:23:19.548 28619-28964/me.aaronchan.ndpresentation D/SimpleService: Task in IntentService[SimpleService] done.
+05-09 08:23:21.549 28619-28964/me.aaronchan.ndpresentation D/SimpleService: Task in IntentService[SimpleService] done.
+05-09 08:23:21.549 28619-28619/me.aaronchan.ndpresentation D/SimpleService: onDestroy
+```
+
 ## 为什么要阅读源码
 
-- 知其然，知其所以然。了解底层，更好地服务上层。
-- 优秀的代码风格和设计理念。作为编码准则，尽量模仿，缩小差距。
-- 了解 `Android` 设计者的意图。
-- 更准确、快速地定位 **Bug**。
+- Andriod 是完全开源的
+- 知其然，知其所以然。了解底层，更好地服务上层
+- 优秀的代码风格和设计理念。作为编码准则，尽量模仿，缩小差距
+- 了解 `Android` 设计者的意图
+- 更准确、快速地定位 **Bug**
 
 ## 参考
 
