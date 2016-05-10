@@ -234,15 +234,15 @@ public boolean dispatchTouchEvent(MotionEvent event) {
 
 ### 常见的事件分发场景
 
-1. 所有的 `View` 都没有消费事件
+- 所有的 `View` 都没有消费事件
 
 ![](screenshots/touch-ignore.jpg)
 
-2. 子 `View` 消费事件
+- 子 `View` 消费事件
 
 ![](screenshots/touch-consumed.jpg) 
 
-3. 父 `View` 拦截事件
+- 父 `View` 拦截事件
 
 ![](screenshots/touch-intercepted.jpg) 
 
@@ -259,6 +259,68 @@ public boolean dispatchTouchEvent(MotionEvent event) {
 - View 的 enabled 属性不影响 onTouchEvent 的默认返回值。
 - onClick 会触发的前提是当前 View 是可点击的，并且它收到了 down 和 up 事件。
 - 事件传递的顺序是由外向内的，即事件总是先传递给父容器，然后再由父容器分发给子 View。但是通过 requestDisallowInterceptTouchEvent 方法可以在子 View 干预父容器的事件分发，ACTION_DOWN 除外。这点是处理滑动冲突，内部拦截法的基础。
+
+### 源码解析
+
+- 事件入口
+
+现在，我们尝试从源码角度去解释上面列出的几个结论。需要做的第一件事情是找出事件的入口在哪里，当手指触碰屏幕的那一刻，手机屏幕的触摸板接收到事件，然后触摸板会将事件传给硬件驱动层，驱动层再将事件转交给 Android 系统，最终会传递到 Android 框架层。那么，我们关心的是事件在 `Android` 框架层的入口在哪里？其实就是 `Activity`。当屏幕收到一个事件时，一定会首先传给 `Activity`，也就是说 `Activity#dispatchTouchEvent()` 会被调用：
+
+```
+public boolean dispatchTouchEvent(MotionEvent ev) {
+    if (ev.getAction() == MotionEvent.ACTION_DOWN) {
+        onUserInteraction();
+    }
+    if (getWindow().superDispatchTouchEvent(ev)) {
+        return true;
+    }
+    return onTouchEvent(ev);
+}
+```
+
+代码很少，但是代码少不代表简单。这里会判断事件类型，如果是 `ACTION_DOWN`，则调用 `onUserInteraction()` 通知外部，用户开始和当前页面交互；紧接着调用 `getWindow().superDispatchTouchEvent()` 方法，如果返回 `true` 则分发结束，否则将调用 `Activity#onTouchEvent()` 方法。直观上的理解，`getWindow().superDispatchTouchEvent()` 做的事情就是让 `Activity` 的所有子 `View` 去分发事件，并且如果所有的子 `View` 都没有消费这个事件，也就是 `getWindow().superDispatchTouchEvent()` 返回 `false`，那么这个事件就由 Activity 处理，即调用 `Activity#onTouchEvent()` 方法。其实，这种情况就是上述的场景#1。
+
+那么，`getWindow().superDispatchTouchEvent()` 具体做了什么呢？点击去发现：
+
+```
+/**
+ * Used by custom windows, such as Dialog, to pass the touch screen event
+ * further down the view hierarchy. Application developers should
+ * not need to implement or call this.
+ *
+ */
+public abstract boolean superDispatchTouchEvent(MotionEvent event);
+```
+
+它是 `Window` 类的一个抽象方法，需要交由它的子类去实现。现在的问题变成，谁是 `Window` 的子类？其实从 `Window` 的注释中可以找到答案：
+
+> /**
+ * Abstract base class for a top-level window look and behavior policy.  An
+ * instance of this class should be used as the top-level view added to the
+ * window manager. It provides standard UI policies such as a background, title
+ * area, default key processing, etc.
+ *
+ * <p>The only existing implementation of this abstract class is
+ * android.view.PhoneWindow, which you should instantiate when needing a
+ * Window.
+ */
+ 
+`Window` 抽象类的唯一实现类是 `android.view.PhoneWindow`。因此，我们找到 `PhoneWindow#superDispatchTouchEvent()` 方法：
+
+```
+@Override
+public boolean superDispatchTouchEvent(MotionEvent event) {
+    return mDecor.superDispatchTouchEvent(event);
+}
+```
+
+一行代码，调用了 `mDecor#superDispatchTouchEvent()` 方法。`mDecor` 就是 `DecorView`，也就是 `Window` 的顶级 `View`。可以用视图层级分析工具 [Hierarchy Viewer](http://developer.android.com/intl/zh-cn/tools/help/hierarchy-viewer.html) 进行验证：
+
+![](screenshots/decor-view.png)
+
+`DecorView` 是 `PhoneWindow` 的一个内部类，通过定义可以看出，它继承自 `FrameLayout`，因此 `mDecor#superDispatchTouchEvent()` 方法其实调用的是 `FrameLayout#dispatchTouchEvent()` 方法。
+
+至此，事件就从 `Activity` 传递到了 `ViewGroup`。接下来，让我们分析事件在 `ViewGroup` 中的传递规则。
 
 ### 解决滑动冲突
 
