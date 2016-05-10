@@ -556,7 +556,26 @@ private void cancelAndClearTouchTargets(MotionEvent event) {
 
 这里，会将消费掉当前事件的 `View` 添加到 `TouchTarget` 中，对 `mFirstTouchTarget` 赋值。这里，可以把 `TouchTarget` 简单理解成一个链表的数据结构。
 
-至此，事件 `ACTION_DOWN` 的分发就全部完成了。我们用以下流程图进行小结：
+至此，事件 `ACTION_DOWN` 的分发就全部完成了。
+
+事件 `ACTION_DOWN` 之后，是伴随着一系列 `ACTION_MOVE`。而事件 `ACTION_MOVE` 和事件 `ACTION_DOWN` 一样，首先会传递到 `ViewGroup#dispatchTouchEvent()` 方法。不过，这时候要确认两件事情：事件类型是 `ACTION_MOVE` 并且 `mFirstTouchTarget != null`。因此，还是会进入以下代码段：
+
+    if (actionMasked == MotionEvent.ACTION_DOWN
+            || mFirstTouchTarget != null) {
+        final boolean disallowIntercept = (mGroupFlags & FLAG_DISALLOW_INTERCEPT) != 0;
+        if (!disallowIntercept) {
+            intercepted = onInterceptTouchEvent(ev);
+            ev.setAction(action); // restore action in case it was changed
+        } else {
+            intercepted = false;
+        }
+    }
+
+和之前情况不同的是，这次是通过第二个条件进入的。换言之，只要子 `View` 没有调用 `ViewGroup#requestDisallowInterceptTouchEvent()` 方法，所有的事件都会传递到 `ViewGroup#onInterceptTouchEvent()`。反之，如果子 `View` 调用了 `ViewGroup#requestDisallowInterceptTouchEvent()` 方法，`ViewGroup#onInterceptTouchEvent()` 方法将不会调用，也就是说 `ViewGroup` 的拦截策略将失效，这是后面要介绍的**内部拦截法**的理论基础。
+
+上述结论有一个特殊情况，那就是当事件是 `ACTION_DOWN` 时，即使子 `View` 调用了 `ViewGroup#requestDisallowInterceptTouchEvent()` 方法，父 `View` 的 `onInterceptTouchEvent()` 方法一样会执行。这是因此，当事件是 `ACTION_DOWN` 时，会调用 `View#resetTouchState()` 方法，在 `View#resetTouchState()` 方法里会对标志位进行重置，`requestDisallowInterceptTouchEvent()` 更新的标志位也就失效了。这里验证了上面列出的**第11个结论**。
+
+接下来的情况和事件 `ACTION_DOWN` 的分发过程类似，这里就不再复述了。
 ### 解决滑动冲突
 
 - 同时水平滑动
