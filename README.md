@@ -529,7 +529,7 @@ private void cancelAndClearTouchTargets(MotionEvent event) {
         if (preorderedList != null) preorderedList.clear();
     }
 
-上面这段代码有点长，但是仔细分析的话，它做的主要工作还是很清晰的：按照 `View` 的层级从上往下依次分发事件，直到某一个 `View` 消费了这个事件，分发停止。这里面有两个方法需要注意，一个是 `ViewGroup#dispatchTransformedTouchEvent()`；另一个是 `ViewGroup#addTouchTarget()`。
+上面这段代码有点长，但是仔细分析的话，它做的主要工作还是很清晰的：按照 `View` 的层级从上往下依次分发事件，直到 `ViewGroup#dispatchTransformedTouchEvent()` 返回 `true`，分发停止。这里面有两个方法需要注意，一个是 `ViewGroup#dispatchTransformedTouchEvent()`；另一个是 `ViewGroup#addTouchTarget()`。
 
 我们先看看 `ViewGroup#dispatchTransformedTouchEvent(MotionEvent event, boolean cancel, View child, int desiredPointerIdBits)` 方法，`ViewGroup` 将事件分发给子 `View` 就是通过这个方法完成的，方法的注释如下：
 
@@ -539,7 +539,26 @@ private void cancelAndClearTouchTargets(MotionEvent event) {
  * If child is null, assumes the MotionEvent will be sent to this ViewGroup instead.
  */
 
-理解这个方法的关键在第三个参数 `child`。如果 `child != null`，那么方法就会调用 `child.dispatchTouchEvent()` 方法，也就完成了事件从父 `View` 到子 `View` 的分发；如果 `child == null`，那么方法就会直接调用 `ViewGroup` 的 `super.dispatchTouchEvent()` 方法，也就是 `View#dispatchTouchEvent()` 逻辑，到这边的逻辑就变成上一部分分析过的 **`View` 事件分发**，这里需要注意下区别。
+理解这个方法的关键在第三个参数 `child`。如果 `child != null`，那么方法就会调用 `child.dispatchTouchEvent()` 方法，也就完成了事件从父 `View` 到子 `View` 的分发；如果 `child == null`，那么方法就会直接调用 `ViewGroup` 的 `super.dispatchTouchEvent()` 方法，也就是 `View#dispatchTouchEvent()` 逻辑，到这边的逻辑就变成上一部分分析过的 **`View` 事件分发**，这里需要注意下区别。如果 `View#dispatchTouchEvent()` 方法返回 `false`，这种情况一般是因为子 `View` 的 `onTouchEvent()` 方法返回 `false`，最终会使 `ViewGroup#dispatchTransformedTouchEvent()` 也返回 `false`。从应用层角度去理解这段逻辑的话就很简单，即事件传递到了子 `View`，但是子 `View` 并没有消费这个事件，也就是最开始提到的场景#1（**所有的 `View` 都没有消费事件**）。这种情况下 `mFirstTouchTarget == null`，因此如果接收到后续的 `ACTION_MOVE` 和 `ACTION_UP` 事件都不会再调用 `ViewGroup#onInterceptTouchEvent()` 方法，并且会直接将 `intercepted` 置为 `false`，相关代码：
+
+    if (actionMasked == MotionEvent.ACTION_DOWN
+        ......
+    } else {
+        // There are no touch targets and this action is not an initial down
+        // so this view group continues to intercept touches.
+        intercepted = true;
+    }
+    
+此时的事件都会交由下面的代码逻辑去处理：
+
+    // Dispatch to touch targets.
+    if (mFirstTouchTarget == null) {
+        // No touch targets so treat this as an ordinary view.
+        handled = dispatchTransformedTouchEvent(ev, canceled, null,
+                TouchTarget.ALL_POINTER_IDS);
+    }
+
+这里 `child == null`，所以调用的是 `ViewGroup` 的 `super.dispatchTouchEvent()` 方法，即事件由 `ViewGroup` 处理。这里验证了 **第4个结论**。
 
 再来看看 `ViewGroup#addTouchTarget()` 方法：
 
@@ -555,6 +574,8 @@ private void cancelAndClearTouchTargets(MotionEvent event) {
     }
 
 这里，会将消费掉当前事件的 `View` 添加到 `TouchTarget` 中，对 `mFirstTouchTarget` 赋值。这里，可以把 `TouchTarget` 简单理解成一个链表的数据结构。
+
+考虑这么一种情况，
 
 至此，事件 `ACTION_DOWN` 的分发就全部完成了。
 
