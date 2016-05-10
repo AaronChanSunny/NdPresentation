@@ -369,6 +369,15 @@ public boolean dispatchTouchEvent(MotionEvent event) {
 接下来，我们具体分析下相关源码，首先是事件拦截逻辑，在 `ViewGroup#dispatchTouchEvent()` 找到如下代码片段： 
 
 ```
+// Handle an initial down.
+if (actionMasked == MotionEvent.ACTION_DOWN) {
+    // Throw away all previous state when starting a new touch gesture.
+    // The framework may have dropped the up or cancel event for the previous gesture
+    // due to an app switch, ANR, or some other state change.
+    cancelAndClearTouchTargets(ev);
+    resetTouchState();
+}
+
 // Check for interception.
 final boolean intercepted;
 if (actionMasked == MotionEvent.ACTION_DOWN
@@ -387,6 +396,186 @@ if (actionMasked == MotionEvent.ACTION_DOWN
 }
 ```
 
+进入事件拦截逻辑的条件有两个，`actionMasked == MotionEvent.ACTION_DOWN` 并且 `mFirstTouchTarget != null`。第一个条件是当前事件类型为 `ACTION_DOWN`，第二个条件 `mFirstTouchTarget != null` 怎么判断呢？对于第二个条件的判断要借助于 `cancelAndClearTouchTargets()` 方法，通过注释可以知道，当 `ViewGroup` 第一次接收到 `ACTION_DOWN` 时会调用这个方法：
+
+```
+/**
+ * Cancels and clears all touch targets.
+ */
+private void cancelAndClearTouchTargets(MotionEvent event) {
+    if (mFirstTouchTarget != null) {
+        boolean syntheticEvent = false;
+        if (event == null) {
+            final long now = SystemClock.uptimeMillis();
+            event = MotionEvent.obtain(now, now,
+                    MotionEvent.ACTION_CANCEL, 0.0f, 0.0f, 0);
+            event.setSource(InputDevice.SOURCE_TOUCHSCREEN);
+            syntheticEvent = true;
+        }
+        for (TouchTarget target = mFirstTouchTarget; target != null; target = target.next) {
+            resetCancelNextUpFlag(target.child);
+            dispatchTransformedTouchEvent(event, true, target.child, target.pointerIdBits);
+        }
+        clearTouchTargets();
+        if (syntheticEvent) {
+            event.recycle();
+        }
+    }
+}
+```
+
+当 `mFirstTouchTarget != null` 时，会调用 `clearTouchTargets()` 方法：
+
+    /**
+     * Clears all touch targets.
+     */
+    private void clearTouchTargets() {
+        TouchTarget target = mFirstTouchTarget;
+        if (target != null) {
+            do {
+                TouchTarget next = target.next;
+                target.recycle();
+                target = next;
+            } while (target != null);
+            mFirstTouchTarget = null;
+        }
+    }
+
+在这里，会将 `mFirstTouchTarget` 重置为空。梳理一下，如果 `ViewGroup` 第一次接收到 `ACTION_DOWN` 事件，那么它会调用 `cancelAndClearTouchTargets()` 方法。`cancelAndClearTouchTargets()` 方法里的流程分两种情况：`mFirstTouchTarget != null` 和 `mFirstTouchTarget == null`。当 `mFirstTouchTarget == null` 时，什么都不做；当 `mFirstTouchTarget != null` 时会将 `mFirstTouchTarget` 重置为 `null`。因此，得出最后的结论，当 `ViewGroup` 第一次接收到 `ACTION_DOWN` 事件时，`mFirstTouchTarget != null` 不成立。
+
+回到开始分析的地方，虽然 `mFirstTouchTarget != null` 不成立，但这两个条件是**或**的关系，因此条件块内部的代码还是会执行：
+
+    if (actionMasked == MotionEvent.ACTION_DOWN
+            || mFirstTouchTarget != null) {
+        final boolean disallowIntercept = (mGroupFlags & FLAG_DISALLOW_INTERCEPT) != 0;
+        if (!disallowIntercept) {
+            intercepted = onInterceptTouchEvent(ev);
+            ev.setAction(action); // restore action in case it was changed
+        } else {
+            intercepted = false;
+        }
+    }
+    
+读取标志位 `disallowIntercept`，这个标志位会受到子 `View` 是否调用 `ViewGroup#requestDisallowInterceptTouchEvent()` 的影响，如果标志位为 `true` 则父 `View` 不拦截事件。解决滑动冲突之内部拦截法就是根据这个方法实现的，后面会详细介绍。如果子 `View` 没有调用 `ViewGroup#requestDisallowInterceptTouchEvent()`，则会进入 `onInterceptTouchEvent()` 方法，默认情况下，`ViewGroup` 是不拦截事件的：
+
+    public boolean onInterceptHoverEvent(MotionEvent event) {
+        return false;
+    }
+
+到目前为止，`intercepted == false` 并且 `mFirstTouchTarget == null`。接着往下看，如果 `ViewGroup` 不拦截事件，它是怎么把事件分发给它的子 `View`：
+
+    if (newTouchTarget == null && childrenCount != 0) {
+        final float x = ev.getX(actionIndex);
+        final float y = ev.getY(actionIndex);
+        // Find a child that can receive the event.
+        // Scan children from front to back.
+        final ArrayList<View> preorderedList = buildOrderedChildList();
+        final boolean customOrder = preorderedList == null
+                && isChildrenDrawingOrderEnabled();
+        final View[] children = mChildren;
+        for (int i = childrenCount - 1; i >= 0; i--) {
+            final int childIndex = customOrder
+                    ? getChildDrawingOrder(childrenCount, i) : i;
+            final View child = (preorderedList == null)
+                    ? children[childIndex] : preorderedList.get(childIndex);
+            // If there is a view that has accessibility focus we want it
+            // to get the event first and if not handled we will perform a
+            // normal dispatch. We may do a double iteration but this is
+            // safer given the timeframe.
+            if (childWithAccessibilityFocus != null) {
+                if (childWithAccessibilityFocus != child) {
+                    continue;
+                }
+                childWithAccessibilityFocus = null;
+                i = childrenCount - 1;
+            }
+            if (!canViewReceivePointerEvents(child)
+                    || !isTransformedTouchPointInView(x, y, child, null)) {
+                ev.setTargetAccessibilityFocus(false);
+                continue;
+            }
+            newTouchTarget = getTouchTarget(child);
+            if (newTouchTarget != null) {
+                // Child is already receiving touch within its bounds.
+                // Give it the new pointer in addition to the ones it is handling.
+                newTouchTarget.pointerIdBits |= idBitsToAssign;
+                break;
+            }
+            resetCancelNextUpFlag(child);
+            if (dispatchTransformedTouchEvent(ev, false, child, idBitsToAssign)) {
+                // Child wants to receive touch within its bounds.
+                mLastTouchDownTime = ev.getDownTime();
+                if (preorderedList != null) {
+                    // childIndex points into presorted list, find original index
+                    for (int j = 0; j < childrenCount; j++) {
+                        if (children[childIndex] == mChildren[j]) {
+                            mLastTouchDownIndex = j;
+                            break;
+                        }
+                    }
+                } else {
+                    mLastTouchDownIndex = childIndex;
+                }
+                mLastTouchDownX = ev.getX();
+                mLastTouchDownY = ev.getY();
+                newTouchTarget = addTouchTarget(child, idBitsToAssign);
+                alreadyDispatchedToNewTouchTarget = true;
+                break;
+            }
+            // The accessibility focus didn't handle the event, so clear
+            // the flag and do a normal dispatch to all children.
+            ev.setTargetAccessibilityFocus(false);
+        }
+        if (preorderedList != null) preorderedList.clear();
+    }
+
+上面这段代码有点长，但是仔细分析的话，它做的主要工作还是很清晰的：按照 `View` 的层级从上往下依次分发事件，直到某一个 `View` 消费了这个事件，分发停止。这里面有两个方法需要注意，一个是 `ViewGroup#dispatchTransformedTouchEvent()`；另一个是 `ViewGroup#addTouchTarget()`。
+
+我们先看看 `ViewGroup#dispatchTransformedTouchEvent(MotionEvent event, boolean cancel, View child, int desiredPointerIdBits)` 方法，`ViewGroup` 将事件分发给子 `View` 就是通过这个方法完成的，方法的注释如下：
+
+> /**
+ * Transforms a motion event into the coordinate space of a particular child view,
+ * filters out irrelevant pointer ids, and overrides its action if necessary.
+ * If child is null, assumes the MotionEvent will be sent to this ViewGroup instead.
+ */
+
+理解这个方法的关键在第三个参数 `child`。如果 `child != null`，那么方法就会调用 `child.dispatchTouchEvent()` 方法，也就完成了事件从父 `View` 到子 `View` 的分发；如果 `child == null`，那么方法就会直接调用 `ViewGroup` 的 `super.dispatchTouchEvent()` 方法，也就是 `View#dispatchTouchEvent()` 逻辑，到这边的逻辑就变成上一部分分析过的 **`View` 事件分发**，这里需要注意下区别。
+
+再来看看 `ViewGroup#addTouchTarget()` 方法：
+
+    /**
+     * Adds a touch target for specified child to the beginning of the list.
+     * Assumes the target child is not already present.
+     */
+    private TouchTarget addTouchTarget(View child, int pointerIdBits) {
+        TouchTarget target = TouchTarget.obtain(child, pointerIdBits);
+        target.next = mFirstTouchTarget;
+        mFirstTouchTarget = target;
+        return target;
+    }
+
+这里，会将消费掉当前事件的 `View` 添加到 `TouchTarget` 中，对 `mFirstTouchTarget` 赋值。这里，可以把 `TouchTarget` 简单理解成一个链表的数据结构。
+
+至此，事件 `ACTION_DOWN` 的分发就全部完成了。
+
+事件 `ACTION_DOWN` 之后，是伴随着一系列 `ACTION_MOVE`。而事件 `ACTION_MOVE` 和事件 `ACTION_DOWN` 一样，首先会传递到 `ViewGroup#dispatchTouchEvent()` 方法。不过，这时候要确认两件事情：事件类型是 `ACTION_MOVE` 并且 `mFirstTouchTarget != null`。因此，还是会进入以下代码段：
+
+    if (actionMasked == MotionEvent.ACTION_DOWN
+            || mFirstTouchTarget != null) {
+        final boolean disallowIntercept = (mGroupFlags & FLAG_DISALLOW_INTERCEPT) != 0;
+        if (!disallowIntercept) {
+            intercepted = onInterceptTouchEvent(ev);
+            ev.setAction(action); // restore action in case it was changed
+        } else {
+            intercepted = false;
+        }
+    }
+
+和之前情况不同的是，这次是通过第二个条件进入的。换言之，只要子 `View` 没有调用 `ViewGroup#requestDisallowInterceptTouchEvent()` 方法，所有的事件都会传递到 `ViewGroup#onInterceptTouchEvent()`。反之，如果子 `View` 调用了 `ViewGroup#requestDisallowInterceptTouchEvent()` 方法，`ViewGroup#onInterceptTouchEvent()` 方法将不会调用，也就是说 `ViewGroup` 的拦截策略将失效，这是后面要介绍的**内部拦截法**的理论基础。
+
+上述结论有一个特殊情况，那就是当事件是 `ACTION_DOWN` 时，即使子 `View` 调用了 `ViewGroup#requestDisallowInterceptTouchEvent()` 方法，父 `View` 的 `onInterceptTouchEvent()` 方法一样会执行。这是因此，当事件是 `ACTION_DOWN` 时，会调用 `View#resetTouchState()` 方法，在 `View#resetTouchState()` 方法里会对标志位进行重置，`requestDisallowInterceptTouchEvent()` 更新的标志位也就失效了。这里验证了上面列出的**第11个结论**。
+
+接下来的情况和事件 `ACTION_DOWN` 的分发过程类似，这里就不再复述了。
 ### 解决滑动冲突
 
 - 同时水平滑动
