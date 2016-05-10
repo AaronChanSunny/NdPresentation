@@ -248,17 +248,17 @@ public boolean dispatchTouchEvent(MotionEvent event) {
 
 ### 几个结论
 
-- 同一个事件序列是指从手指接触屏幕的那一刻起，到手指离开屏幕的那一刻结束。在这个过程中所产生的一系列事件，这个事件序列以 down 事件开始，中间含有数量不定的 move 事件，最终以 up 结束。
-- 正常情况下，一个事件序列只能被一个 View 拦截并且消耗。只要一个 View 拦截了某一事件，那么同一事件序列内的所有事件都会交给它处理。
-- 某个 View 一旦决定拦截，那么这一事件序列都只能由它来处理，并且它的 onInterceptTouchEvent 将不会被再调用。
-- 某个 View 一旦开始处理事件，如果它不消耗 ACTION_DOWN 事件，那么同一事件序列的其他事件都不会再交给它处理，并且事件将重新交给它的父容器去处理，即父容器的 onTouchEvent 会被调用。
-- 如果 View 不消耗除 ACTION_DOWN 以外的其他事件，这个点击事件会消失，此时父容器的 onTouchEvent 并不会被调用，并且当前 View 可以持续收到后续事件，最终这些消失的点击事件会传递给 Activity 处理。
-- ViewGroup 默认不拦截任何事件。
-- View 没有 onInterceptTouchEvent 方法，一旦有点击事件传递给它，它的 onTouchEvent 就会被调用。
-- View 的 onTouchEvent 默认都会消耗事件，除非它是不可点击的，所谓不可点击是 clickable 和 longClickable 同时为 false。需要注意的是 View 的 longClickable 默认为 false；而 clickable 要分情况，比如 Button 默认为 true，而 TextView 默认为 false。
-- View 的 enabled 属性不影响 onTouchEvent 的默认返回值。
-- onClick 会触发的前提是当前 View 是可点击的，并且它收到了 down 和 up 事件。
-- 事件传递的顺序是由外向内的，即事件总是先传递给父容器，然后再由父容器分发给子 View。但是通过 requestDisallowInterceptTouchEvent 方法可以在子 View 干预父容器的事件分发，ACTION_DOWN 除外。这点是处理滑动冲突，内部拦截法的基础。
+1. 同一个事件序列是指从手指接触屏幕的那一刻起，到手指离开屏幕的那一刻结束。在这个过程中所产生的一系列事件，这个事件序列以 down 事件开始，中间含有数量不定的 move 事件，最终以 up 结束。
+2. 正常情况下，一个事件序列只能被一个 View 拦截并且消耗。只要一个 View 拦截了某一事件，那么同一事件序列内的所有事件都会交给它处理。
+3. 某个 View 一旦决定拦截，那么这一事件序列都只能由它来处理，并且它的 onInterceptTouchEvent 将不会被再调用。
+4. 某个 View 一旦开始处理事件，如果它不消耗 ACTION_DOWN 事件，那么同一事件序列的其他事件都不会再交给它处理，并且事件将重新交给它的父容器去处理，即父容器的 onTouchEvent 会被调用。
+5. 如果 View 不消耗除 ACTION_DOWN 以外的其他事件，这个点击事件会消失，此时父容器的 onTouchEvent 并不会被调用，并且当前 View 可以持续收到后续事件，最终这些消失的点击事件会传递给 Activity 处理。
+6. ViewGroup 默认不拦截任何事件。
+7. View 没有 onInterceptTouchEvent 方法，一旦有点击事件传递给它，它的 onTouchEvent 就会被调用。
+8. View 的 onTouchEvent 默认都会消耗事件，除非它是不可点击的，所谓不可点击是 clickable 和 longClickable 同时为 false。需要注意的是 View 的 longClickable 默认为 false；而 clickable 要分情况，比如 Button 默认为 true，而 TextView 默认为 false。
+9. View 的 enabled 属性不影响 onTouchEvent 的默认返回值。
+10. onClick 会触发的前提是当前 View 是可点击的，并且它收到了 down 和 up 事件。
+11. 事件传递的顺序是由外向内的，即事件总是先传递给父容器，然后再由父容器分发给子 View。但是通过 requestDisallowInterceptTouchEvent 方法可以在子 View 干预父容器的事件分发，ACTION_DOWN 除外。这点是处理滑动冲突，内部拦截法的基础。
 
 ### 源码解析
 
@@ -316,7 +316,7 @@ public boolean superDispatchTouchEvent(MotionEvent event) {
 
 一行代码，调用了 `mDecor#superDispatchTouchEvent()` 方法。`mDecor` 就是 `DecorView`，也就是 `Window` 的顶级 `View`。可以用视图层级分析工具 [Hierarchy Viewer](http://developer.android.com/intl/zh-cn/tools/help/hierarchy-viewer.html) 进行验证：
 
-![](screenshots/decor-view.png)
+![](screenshots/decor-view.jpg)
 
 `DecorView` 是 `PhoneWindow` 的一个内部类，通过定义可以看出，它继承自 `FrameLayout`，因此 `mDecor#superDispatchTouchEvent()` 方法其实调用的是 `FrameLayout#dispatchTouchEvent()` 方法。
 
