@@ -213,25 +213,6 @@ public void onStart(Intent intent, int startId) {
 
 同样在 dispatchTouchEvent 内部调用，用来处理点击事件，返回结果表示是否消耗当前事件。如果不消耗，在同一事件序列中，当前 View 无法再次接收到事件。
 
-### 分发伪代码
-
-`ViewGroup` 的事件分发和 `View` 相比要复杂的多，这里以 `ViewGroup` 的事件分发源码举例说明。`ViewGroup` 的 `ViewGroup#dispatchTouchEvent()` 方法很长，但是核心处理流程可以用如下伪代码总结：
-
-```
-public boolean dispatchTouchEvent(MotionEvent event) {
-    boolean consumed = false;
-    if (onInterceptTouchEvent(event)) {
-        consumed = onTouchEvent(event);
-    } else {
-        consumed = child.dispatchTouchEvent(event);
-    }
-
-    return consumed;
-}
-```
-
-当一个事件能够传递到当前 `ViewGroup`，那么它的 `dispatchTouchEvent()` 方法一定会被调用。在 `dispatchTouchEvent()` 内部，首先会判断当前 `ViewGroup` 是否要拦截这个事件，如果拦截，即 `onInterceptTouchEvent()` 返回 `true`，则事件交给当前 `ViewGroup` 处理，即 `ViewGroup#onTouchEvent()` 将被调用，事件停止往下分发；如果 `ViewGroup` 不拦截这个事件，那么将调用 `child.dispatchTouchEvent()` 方法，即事件将传递给能接收到该事件的子 `View`，子 `View` 的事件分发过程类似。
-
 ### 常见的事件分发场景
 
 - 所有的 `View` 都没有消费事件
@@ -322,11 +303,89 @@ public boolean superDispatchTouchEvent(MotionEvent event) {
 
 至此，事件就从 `Activity` 传递到了 `ViewGroup`。接下来，让我们分析事件在 `ViewGroup` 中的传递规则。
 
-- 事件分发
+- `View` 事件分发
 
-Android 事件分发机制最复杂的部分就在 `ViewGroup` 中，它包含了事件的分发策略、拦截策略和自身对事件的消费。同样的，只要事件能够到达 `ViewGroup` 就一定会调用 `dispatchTouchEvent()` 方法。这里，我们以 `dispatchTouchEvent()` 作为切入点开始分析。
+这里的 `View` 指的是单纯的 `View`，也就是不包含任何子 `View`。同 `Activity` 一样，`View` 的事件入口也是在 `dispatchTouchEvent()`，并且对于 `View` 来说没有拦截策略，即没有 `onInterceptTouchEvent()` 方法，对于一个事件，要么消费，要么回传给父 `View`。`View#dispatchTouchEvent()` 的关键代码如下：
 
-- 事件消费
+```
+/**
+ * Pass the touch screen motion event down to the target view, or this
+ * view if it is the target.
+ *
+ * @param event The motion event to be dispatched.
+ * @return True if the event was handled by the view, false otherwise.
+ */
+public boolean dispatchTouchEvent(MotionEvent event) {
+    
+    ......
+    
+    final int actionMasked = event.getActionMasked();
+    if (actionMasked == MotionEvent.ACTION_DOWN) {
+        // Defensive cleanup for new gesture
+        stopNestedScroll();
+    }
+    if (onFilterTouchEventForSecurity(event)) {
+        //noinspection SimplifiableIfStatement
+        ListenerInfo li = mListenerInfo;
+        if (li != null && li.mOnTouchListener != null
+                && (mViewFlags & ENABLED_MASK) == ENABLED
+                && li.mOnTouchListener.onTouch(this, event)) {
+            result = true;
+        }
+        if (!result && onTouchEvent(event)) {
+            result = true;
+        }
+    }
+    
+    ......
+    
+    return result;
+}
+```
+
+当 `View` 收到事件后，首先会判断是否设置了 `OnTouchListener`，如果 `OnTouchListener` 不为空，并且当前 `View` 处于可用状态（`enabled = true`），那么事件就交给 `OnTouchListener#onTouch()` 方法去处理，这个时候并不会调用 `View#onTouchEvent()` 方法。换句话说，如果对一个 `View` 设置了 `OnTouchListener`，它的优先级是比 `View#onTouchEvent()` 高的，它会拦截事件，使 `View#onTouchEvent()` 得不到执行。
+
+如果 `OnTouchListener` 为空，事件就会传递到 `View#onTouchEvent()` 方法。到此，`View` 事件分发结束。
+
+- `ViewGroup` 事件分发
+
+`ViewGroup` 的事件分发相比 `Activity` 和单纯的 `View` 都要复杂的多。`ViewGroup` 的 `ViewGroup#dispatchTouchEvent()` 方法很长，但是核心处理流程可以用如下伪代码总结：
+
+```
+public boolean dispatchTouchEvent(MotionEvent event) {
+    boolean consumed = false;
+    if (onInterceptTouchEvent(event)) {
+        consumed = onTouchEvent(event);
+    } else {
+        consumed = child.dispatchTouchEvent(event);
+    }
+
+    return consumed;
+}
+```
+
+当一个事件能够传递到当前 `ViewGroup`，那么它的 `dispatchTouchEvent()` 方法一定会被调用。在 `dispatchTouchEvent()` 内部，首先会判断当前 `ViewGroup` 是否要拦截这个事件，如果拦截，即 `onInterceptTouchEvent()` 返回 `true`，则事件交给当前 `ViewGroup` 处理，即 `ViewGroup#onTouchEvent()` 将被调用，事件停止往下分发；如果 `ViewGroup` 不拦截这个事件，那么将调用 `child.dispatchTouchEvent()` 方法，即事件将传递给能接收到该事件的子 `View`，子 `View` 的事件分发再重复上述步骤。
+
+接下来，我们具体分析下相关源码，首先是事件拦截逻辑，在 `ViewGroup#dispatchTouchEvent()` 找到如下代码片段： 
+
+```
+// Check for interception.
+final boolean intercepted;
+if (actionMasked == MotionEvent.ACTION_DOWN
+        || mFirstTouchTarget != null) {
+    final boolean disallowIntercept = (mGroupFlags & FLAG_DISALLOW_INTERCEPT) != 0;
+    if (!disallowIntercept) {
+        intercepted = onInterceptTouchEvent(ev);
+        ev.setAction(action); // restore action in case it was changed
+    } else {
+        intercepted = false;
+    }
+} else {
+    // There are no touch targets and this action is not an initial down
+    // so this view group continues to intercept touches.
+    intercepted = true;
+}
+```
 
 ### 解决滑动冲突
 
