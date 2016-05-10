@@ -108,6 +108,10 @@ public class MainActivity extends AppCompatActivity {
                 "Touch Event Intercepted",
                 "A button in scroll view.",
                 TouchInterceptedActivity.class));
+        mItems.add(new Item(false,
+                "View Default Clickable Attribute",
+                "Print view default clickable attr.",
+                ViewDefaultAttrActivity.class));
 
         mAdapter = new ItemAdapter(mItems);
     }

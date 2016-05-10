@@ -85,6 +85,15 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".activity.MainActivity"/>
         </activity>
+        <activity
+            android:name=".activity.ViewDefaultAttrActivity"
+            android:label="@string/title_activity_view_default_attr"
+            android:parentActivityName=".activity.MainActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="me.aaronchan.ndpresentation.activity.MainActivity"/>
+        </activity>
     </application>
 
 </manifest>

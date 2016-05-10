@@ -14,4 +14,5 @@
     <string name="title_activity_touch_ignore">TouchIgnoreActivity</string>
     <string name="title_activity_touch_consumed">TouchConsumedActivity</string>
     <string name="title_activity_touch_intercepted">TouchInterceptedActivity</string>
+    <string name="title_activity_view_default_attr">ViewDefaultAttrActivity</string>
 </resources>
