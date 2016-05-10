@@ -322,11 +322,11 @@ public boolean superDispatchTouchEvent(MotionEvent event) {
 
 至此，事件就从 `Activity` 传递到了 `ViewGroup`。接下来，让我们分析事件在 `ViewGroup` 中的传递规则。
 
-### 事件分发
+- 事件分发
 
 Android 事件分发机制最复杂的部分就在 `ViewGroup` 中，它包含了事件的分发策略、拦截策略和自身对事件的消费。同样的，只要事件能够到达 `ViewGroup` 就一定会调用 `dispatchTouchEvent()` 方法。这里，我们以 `dispatchTouchEvent()` 作为切入点开始分析。
 
-### 事件消费
+- 事件消费
 
 ### 解决滑动冲突
 
