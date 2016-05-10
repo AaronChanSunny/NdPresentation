@@ -5,11 +5,16 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 
 import me.aaronchan.ndpresentation.R;
+import me.aaronchan.ndpresentation.util.ActionUtil;
 
 public class TouchConsumedActivity extends AppCompatActivity {
+
+    private static final String TAG = TouchConsumedActivity.class.getSimpleName();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,6 +32,18 @@ public class TouchConsumedActivity extends AppCompatActivity {
             }
         });
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+    }
+
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent ev) {
+        Log.d(TAG, "dispatchTouchEvent, action is " + ActionUtil.getAction((ev.getAction())));
+        return super.dispatchTouchEvent(ev);
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        Log.d(TAG, "onTouchEvent, action is " + ActionUtil.getAction(event.getAction()));
+        return super.onTouchEvent(event);
     }
 
 }
