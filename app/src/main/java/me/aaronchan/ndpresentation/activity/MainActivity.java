@@ -116,6 +116,11 @@ public class MainActivity extends AppCompatActivity {
                 "View Default Clickable Attribute",
                 "Print view default clickable attr.",
                 ViewDefaultAttrActivity.class));
+        mItems.add(new Item(true, "Android IPC"));
+        mItems.add(new Item(false,
+                "Use Messenger",
+                "A messenger sample.",
+                MessengerActivity.class));
 
         mAdapter = new ItemAdapter(mItems);
     }
