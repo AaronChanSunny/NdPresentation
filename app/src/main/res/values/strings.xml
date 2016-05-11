@@ -16,4 +16,5 @@
     <string name="title_activity_touch_intercepted">TouchInterceptedActivity</string>
     <string name="title_activity_view_default_attr">ViewDefaultAttrActivity</string>
     <string name="label_click_me">Click Me</string>
+    <string name="title_activity_event_dispatch5">EventDispatch5Activity</string>
 </resources>

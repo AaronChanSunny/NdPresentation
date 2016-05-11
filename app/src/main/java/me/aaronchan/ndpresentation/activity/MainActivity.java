@@ -109,6 +109,10 @@ public class MainActivity extends AppCompatActivity {
                 "A button in scroll view.",
                 TouchInterceptedActivity.class));
         mItems.add(new Item(false,
+                "Event Dispatch Rule 5",
+                "Rule 5 sample.",
+                EventDispatch5Activity.class));
+        mItems.add(new Item(false,
                 "View Default Clickable Attribute",
                 "Print view default clickable attr.",
                 ViewDefaultAttrActivity.class));
