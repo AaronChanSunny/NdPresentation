@@ -623,6 +623,7 @@ private void cancelAndClearTouchTargets(MotionEvent event) {
 - 优秀的代码风格和设计理念。作为编码准则，尽量模仿，缩小差距
 - 了解 `Android` 设计者的意图
 - 提高 **Bug** 敏感度
+- 创造代码，而不是搬运代码
 
 ## 参考
 
