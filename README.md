@@ -462,6 +462,8 @@ private void cancelAndClearTouchTargets(MotionEvent event) {
         return false;
     }
 
+这边验证了上述的**第6条结论**。
+
 到目前为止，`intercepted == false` 并且 `mFirstTouchTarget == null`。接着往下看，如果 `ViewGroup` 不拦截事件，它是怎么把事件分发给它的子 `View`：
 
     if (newTouchTarget == null && childrenCount != 0) {
@@ -608,10 +610,55 @@ private void cancelAndClearTouchTargets(MotionEvent event) {
 上述结论有一个特殊情况，那就是当事件是 `ACTION_DOWN` 时，即使子 `View` 调用了 `ViewGroup#requestDisallowInterceptTouchEvent()` 方法，父 `View` 的 `onInterceptTouchEvent()` 方法一样会执行。这是因此，当事件是 `ACTION_DOWN` 时，会调用 `View#resetTouchState()` 方法，在 `View#resetTouchState()` 方法里会对标志位进行重置，`requestDisallowInterceptTouchEvent()` 更新的标志位也就失效了。这里验证了上面列出的**第11个结论**。
 
 接下来的情况和事件 `ACTION_DOWN` 的分发过程类似，这里就不再复述了。
+
+- `View#onTouchEvent()`
+
+事件如果最终能够传递到 `View#onTouchEvent()` 方法，那么这个事件就是由 `View` 进行处理。核心源码如下：
+
+    if (((viewFlags & CLICKABLE) == CLICKABLE ||
+            (viewFlags & LONG_CLICKABLE) == LONG_CLICKABLE) ||
+            (viewFlags & CONTEXT_CLICKABLE) == CONTEXT_CLICKABLE) {
+        switch (action) {
+            ......
+        }
+        return true;
+    }
+    
+可以看出，只要一个 `View` 是可点击的，那么他就会消耗事件。样例代码中的 `CustomButton` 直接继承自 `Button`，因此它是可点击的，所以肯定会消耗掉传递到它的所有事件。需要说明，这里的可点击包括常规点击、长按点击和上下文点击，具体可以看相应标志位的注释。
+
+再细看 `View#onTouchEvent()` 方法，在处理事件 `ACTION_UP` 的逻辑里面有一段代码：
+
+    if (!mHasPerformedLongPress && !mIgnoreNextUpEvent) {
+        // This is a tap, so remove the longpress check
+        removeLongPressCallback();
+        // Only perform take click actions if we were in the pressed state
+        if (!focusTaken) {
+            // Use a Runnable and post this rather than calling
+            // performClick directly. This lets other visual state
+            // of the view update before click actions start.
+            if (mPerformClick == null) {
+                mPerformClick = new PerformClick();
+            }
+            if (!post(mPerformClick)) {
+                performClick();
+            }
+        }
+    }
+    
+通过这段代码可以指定，如果当前 `View` 能够执行点击事件 `performClick()` 必须满足：接收到了 `ACTION_UP` 事件并且是点击事件，并且还需要消费了 `ACTION_DOWN` 事件。这里验证了**第8条、第9条、第10条结论**。
+
 ### 解决滑动冲突
 
+理解了事件的分发机制，解决各种滑动冲突就变得有章可循了。这里会列举出三种常见的滑动冲突场景，其实第三类滑动冲突场景本质上还是场景1和场景2的叠加，处理方式上还是类似的。这里会对各个场景画一个简单的示意图，并给出相应的解决冲突的伪代码。
+
 - 同时水平滑动
+
+![](screenshots/viewpager-listview.png) ![](screenshots/horizontal-vectical-listview.png)
+
 - 一个水平滑动、一个竖直滑动
+
+![](screenshots/vetical-listview.png)
+
 - 上述两种情况嵌套
 
 ### 一个例子
