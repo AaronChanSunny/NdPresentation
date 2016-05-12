@@ -653,7 +653,7 @@ private void cancelAndClearTouchTargets(MotionEvent event) {
 
 ### 解决滑动冲突
 
-理解了事件的分发机制，解决各种滑动冲突就变得有章可循了。这里会列举出三种常见的滑动冲突场景，其实第三类滑动冲突场景本质上还是场景1和场景2的叠加，处理方式上还是类似的。这里会对各个场景画一个简单的示意图，并给出相应的解决冲突的伪代码。
+理解了事件的分发机制，解决各种滑动冲突就变得有章可循了。这里会列举出三种常见的滑动冲突场景，其实第三类滑动冲突场景本质上还是场景1和场景2的叠加，处理方式上还是类似的。这里先给出各个场景的简单示意图。
 
 - 同时水平滑动
 
@@ -667,7 +667,79 @@ private void cancelAndClearTouchTargets(MotionEvent event) {
 
 ![](screenshots/with-sliding-menu.png)
 
-### 一个例子
+解决滑动冲突的思路有两种：一种是通过重写父 `View` 的 `onInterceptTouchEvent()` 方法，让父 `View` 来决定是否要拦截事件，这种处理方式称为**外部拦截法**；另一种是父 `View` 不拦截任何事件，所有的事件都能传递给子 `View`，如果子 `View` 需要这个事件就直接消耗事件，如果不需要处理事件就把事件重新冒泡给父 `View`，这里需要配合 `ViewGroup#requestDisallowInterceptTouchEvent()` 方法。现在分别贴出两种处理方式的伪代码：
+
+- 外部拦截法
+
+```
+@Override
+public boolean onInterceptTouchEvent(MotionEvent ev) {
+    boolean intercepted =false;
+    int x = (int) ev.getX();
+    int y = (int) ev.getY();
+    
+    switch (ev.getAction()) {
+        case MotionEvent.ACTION_DOWN:
+            intercepted = false;
+            break;
+        case MotionEvent.ACTION_MOVE:
+            if (如果父视图需要当前事件) {
+                intercepted = true;
+            } else {
+                intercepted =false;
+            }
+            break;
+        case MotionEvent.ACTION_UP:
+            intercepted = false;
+            break;
+        default:
+            break;
+    }
+    
+    mLastX = x;
+    mLastY = y;
+    
+    return intercepted;
+}
+```
+
+- 内部拦截法
+
+```
+@Override
+public boolean dispatchTouchEvent(MotionEvent ev) {
+    int x = (int) ev.getX();
+    int y = (int) ev.getY();
+    switch (ev.getAction()) {
+        case MotionEvent.ACTION_DOWN:
+            getParent().requestDisallowInterceptTouchEvent(true);
+            break;
+        case MotionEvent.ACTION_MOVE:
+            int deltaY = y - mLastY;
+            if (父视图需要该事件) {
+                getParent().requestDisallowInterceptTouchEvent(false);
+            }
+            break;
+        case MotionEvent.ACTION_UP:
+            break;
+        default:
+            break;
+    }
+    
+    mLastX = x;
+    mLastY = y;
+    
+    return super.dispatchTouchEvent(ev);
+}
+```
+
+推荐使用外部拦截法处理事件冲突，一方面是外部拦截法比较符合事件先由上自下分发再由下自上冒泡的分发规则；另一方面，外部拦截法的逻辑也较为简单，不需要调用额外的方法。
+
+最后还需要提一下，如果一个父视图始终拦截所有事件，那么内部拦截法就失效了。因此，实际运用的话要根据具体情况进行选择，尽量选择外部拦截法来处理滑动冲突问题。
+
+### 两个例子
+
+![](screenshots/scroll-conflict-sample1.png) ![](screenshots/scroll-conflict-sample2.png)
 
 ## 为什么要阅读源码
 
