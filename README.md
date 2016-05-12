@@ -12,6 +12,11 @@
 
 除了上述三部分，完成线程切换的秘诀在于 `ThreadLocal`。简单的说，`ThreadLocal` 允许我们通过同一个对象在不同线程中存储不同的数据。具体运用到 `Android` 消息机制中，就是存储每个线程的 `Looper` 对象。
 
+结论：
+
+－ 通过调用 `Message.obtain()` 效率优于直接创建一个 `Message` 对象
+－ 消息处理是有优先级的，具体优先级：`message.callback.run()` > `Handler.mCallback.handleMessage(msg)` > `Handler.handleMessage(msg)`。
+
 ### AsyncTask
 
 `AsyncTask` 是 `Google` 为了简化 `Android` 中的异步编程而封装出的一个类。`AsyncTask` 实际上用到还是 `Android` 消息机制，只是 `Google` 将实现细节隐藏了，通过暴露几个关键的方法，让开发者很容易实现自己的异步任务，简化了实现异步任务的复杂性和可控制性。
