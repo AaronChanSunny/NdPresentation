@@ -42,6 +42,11 @@ public class CustomListView2 extends ListView {
         return mReachedTop;
     }
 
+    /**
+     * 滑动冲突#内部拦截法
+     * @param ev
+     * @return
+     */
     @Override
     public boolean dispatchTouchEvent(MotionEvent ev) {
         int y = (int) ev.getY();

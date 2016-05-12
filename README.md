@@ -739,7 +739,7 @@ public boolean dispatchTouchEvent(MotionEvent ev) {
 
 ### 两个例子
 
-![](images/scroll-conflict-sample-default.gif) ![](images/scroll-conflict-sample1.gif)
+![](images/scroll-conflict-default.gif) ![](images/scroll-conflict-sample.gif)
 
 ## 为什么要阅读源码
 
