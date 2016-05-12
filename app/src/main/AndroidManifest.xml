@@ -57,7 +57,9 @@
         </activity>
 
         <service android:name=".service.SimpleService"/>
-        <service android:name=".service.MessengerService" android:process=":remote"/>
+        <service
+            android:name=".service.MessengerService"
+            android:process=":remote"/>
 
         <activity
             android:name=".activity.TouchIgnoreActivity"
@@ -107,6 +109,15 @@
         <activity
             android:name=".activity.MessengerActivity"
             android:label="@string/title_activity_messenger"
+            android:parentActivityName=".activity.MainActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="me.aaronchan.ndpresentation.activity.MainActivity"/>
+        </activity>
+        <activity
+            android:name=".activity.ScrollConflictActivity"
+            android:label="@string/title_activity_scroll_conflict"
             android:parentActivityName=".activity.MainActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data

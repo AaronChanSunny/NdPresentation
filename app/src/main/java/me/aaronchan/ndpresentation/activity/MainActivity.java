@@ -116,6 +116,10 @@ public class MainActivity extends AppCompatActivity {
                 "View Default Clickable Attribute",
                 "Print view default clickable attr.",
                 ViewDefaultAttrActivity.class));
+        mItems.add(new Item(false,
+                "Scroll Conflict",
+                "One scroll confliction sample",
+                ScrollConflictActivity.class));
         mItems.add(new Item(true, "Android IPC"));
         mItems.add(new Item(false,
                 "Use Messenger",
