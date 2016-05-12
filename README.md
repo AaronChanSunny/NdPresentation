@@ -657,11 +657,11 @@ private void cancelAndClearTouchTargets(MotionEvent event) {
 
 - 同时水平滑动
 
-![](screenshots/viewpager-listview.png) ![](screenshots/horizontal-vectical-listview.png)
+![](screenshots/viewpager-listview.png) ![](screenshots/same-direction.png)
 
 - 一个水平滑动、一个竖直滑动
 
-![](screenshots/vetical-listview.png)
+![](screenshots/diff-direction.png)
 
 - 上述两种情况嵌套
 
