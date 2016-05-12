@@ -8,7 +8,7 @@
 
 除了上述三部分，完成线程切换的秘诀在于 `ThreadLocal`。简单的说，`ThreadLocal` 允许我们通过同一个对象在不同线程中存储不同的数据。具体运用到 `Android` 消息机制中，就是存储每个线程的 `Looper` 对象。
 
-![](images/handler-message-looper.png)
+![](http://gityuan.com/images/handler/handler_java.jpg)
 
 ![](images/android-async-uml.png)
 
@@ -753,6 +753,7 @@ public boolean dispatchTouchEvent(MotionEvent ev) {
 ## 参考
 
 - **Android** 开发艺术探索
+- [Android消息机制1-Handler(Java层)](http://gityuan.com/2015/12/26/handler-message-framework/)
 - [进程和线程](http://developer.android.com/intl/zh-cn/guide/components/processes-and-threads.html)
 - [Mastering	the	Android Touch	System](http://files.cnblogs.com/files/sunzn/PRE_andevcon_mastering-the-android-touch-system.pdf)
 - [Android事件分发机制](http://gityuan.com/2015/09/19/android-touch/)
