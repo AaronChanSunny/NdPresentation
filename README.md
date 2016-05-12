@@ -661,6 +661,8 @@ private void cancelAndClearTouchTargets(MotionEvent event) {
 
 - 上述两种情况嵌套
 
+![](screenshots/with-sliding-menu.png)
+
 ### 一个例子
 
 ## 为什么要阅读源码
