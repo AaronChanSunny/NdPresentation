@@ -80,6 +80,10 @@ public class MainActivity extends AppCompatActivity {
 
         mItems.add(new Item(true, "Android Async Framework"));
         mItems.add(new Item(false,
+                "ThreadLocal Sample",
+                "A simple thread local sample, show values among three thread.",
+                ThreadLocalActivity.class));
+        mItems.add(new Item(false,
                 "Handler Without Looper",
                 "Create handler in thread without " + "looper throw exception.",
                 HandlerCreationActivity.class));
