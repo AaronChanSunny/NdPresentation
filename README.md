@@ -184,6 +184,10 @@ public void onStart(Intent intent, int startId) {
 
 ## View 事件分发机制
 
+从宏观上看，Android 中的事件分发可以理解成两个过程：往下分发和向上冒泡。这边的上和下是 `View` 的层级关系。当屏幕接收到一个事件时，首先会传递给 `Activity`，再 `Activity` 向下分发给 `ViewGroup` 直到最下层的 `View`，在分发过程中 `ViewGroup` 可以决定是否要拦截该事件；当事件到底最下层 `View` 时，开始事件处理逻辑，决定是否消费这个事件，如果不消费，将事件向上冒泡给父 `View`，如果所有的 `View` 都没有消费这个事件，事件最后会回到 `Activity`，交由 `Activity` 处理。
+
+![](http://gityuan.com/images/touch/touch1.jpg)
+
 ### 事件和事件序列（手势）
 
 在 Android 中，事件可以分为：
