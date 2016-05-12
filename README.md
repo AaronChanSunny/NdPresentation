@@ -755,3 +755,4 @@ public boolean dispatchTouchEvent(MotionEvent ev) {
 - **Android** 开发艺术探索
 - [进程和线程](http://developer.android.com/intl/zh-cn/guide/components/processes-and-threads.html)
 - [Mastering	the	Android Touch	System](http://files.cnblogs.com/files/sunzn/PRE_andevcon_mastering-the-android-touch-system.pdf)
+- [Android事件分发机制](http://gityuan.com/2015/09/19/android-touch/)
