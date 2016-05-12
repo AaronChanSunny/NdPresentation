@@ -6,11 +6,11 @@
 
 `Android` 消息机制由 `Handler`, `Looper`, `Message` 三部分组成。其中，`Message` 是一个单链表数据结构，负责存储消息；`Handler` 往消息队列 `Message` 发送消息；`Looper` 不断从消息队列里读取消息，如果有新的消息到达，取出消息，并分发给 `Handler` 预先定义好的 `Hook` 函数去处理。
 
-除了上述三部分，完成线程切换的秘诀在于 `ThreadLocal`。简单的说，`ThreadLocal` 允许我们通过同一个对象在不同线程中存储不同的数据。具体运用到 `Android` 消息机制中，就是存储每个线程的 `Looper` 对象。
-
 ![](http://gityuan.com/images/handler/handler_java.jpg)
 
 ![](images/android-async-uml.png)
+
+除了上述三部分，完成线程切换的秘诀在于 `ThreadLocal`。简单的说，`ThreadLocal` 允许我们通过同一个对象在不同线程中存储不同的数据。具体运用到 `Android` 消息机制中，就是存储每个线程的 `Looper` 对象。
 
 ### AsyncTask
 
