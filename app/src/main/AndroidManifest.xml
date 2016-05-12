@@ -60,6 +60,9 @@
         <service
             android:name=".service.MessengerService"
             android:process=":remote"/>
+        <service
+            android:name=".service.RemoteService"
+            android:process=":remote"/>
 
         <activity
             android:name=".activity.TouchIgnoreActivity"
@@ -136,6 +139,15 @@
         <activity
             android:name=".activity.ThreadLocalActivity"
             android:label="@string/title_activity_thread_local"
+            android:parentActivityName=".activity.MainActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="me.aaronchan.ndpresentation.activity.MainActivity"/>
+        </activity>
+        <activity
+            android:name=".activity.RemoteServiceActivity"
+            android:label="@string/title_activity_remote_service"
             android:parentActivityName=".activity.MainActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data

@@ -22,4 +22,6 @@
     <string name="title_activity_scroll_conflict1">ScrollConflict1Activity</string>
     <string name="title_activity_scroll_conflict2">ScrollConflict2Activity</string>
     <string name="title_activity_thread_local">ThreadLocalActivity</string>
+    <string name="title_activity_remote_service">RemoteServiceActivity</string>
+    <string name="btn_start_remote_service">Start Remote Service</string>
 </resources>

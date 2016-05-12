@@ -133,6 +133,10 @@ public class MainActivity extends AppCompatActivity {
                 "Use Messenger",
                 "A messenger sample.",
                 MessengerActivity.class));
+        mItems.add(new Item(false,
+                "Use AIDL",
+                "A AIDL sample code.",
+                RemoteServiceActivity.class));
 
         mAdapter = new ItemAdapter(mItems);
     }
