@@ -116,8 +116,17 @@
                 android:value="me.aaronchan.ndpresentation.activity.MainActivity"/>
         </activity>
         <activity
-            android:name=".activity.ScrollConflictActivity"
-            android:label="@string/title_activity_scroll_conflict"
+            android:name=".activity.ScrollConflict1Activity"
+            android:label="@string/title_activity_scroll_conflict1"
+            android:parentActivityName=".activity.MainActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="me.aaronchan.ndpresentation.activity.MainActivity"/>
+        </activity>
+        <activity
+            android:name=".activity.ScrollConflict2Activity"
+            android:label="@string/title_activity_scroll_conflict2"
             android:parentActivityName=".activity.MainActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data

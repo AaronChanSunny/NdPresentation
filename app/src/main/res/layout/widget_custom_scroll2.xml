@@ -16,7 +16,7 @@
         android:layout_marginTop="@dimen/activity_vertical_margin"
         android:background="@android:color/holo_blue_light"/>
 
-    <me.aaronchan.ndpresentation.widget.CustomListView
+    <me.aaronchan.ndpresentation.widget.CustomListView2
         android:id="@+id/lv_sample"
         android:layout_width="match_parent"
         android:layout_height="200dp"

@@ -2,21 +2,22 @@ package me.aaronchan.ndpresentation.widget;
 
 import android.content.Context;
 import android.util.AttributeSet;
+import android.view.MotionEvent;
 import android.widget.AbsListView;
 import android.widget.ListView;
 
 /**
  * Created by Administrator on 2016/5/12.
  */
-public class CustomListView extends ListView {
+public class CustomListView2 extends ListView {
 
-    private static final String TAG = CustomListView.class.getSimpleName();
+    private static final String TAG = CustomListView2.class.getSimpleName();
 
     private int mLastY = 0;
     private boolean mReachedTop = false;
     private boolean mReachedBottom =false;
 
-    public CustomListView(Context context, AttributeSet attrs) {
+    public CustomListView2(Context context, AttributeSet attrs) {
         super(context, attrs);
 
         setOnScrollListener(new OnScrollListener() {
@@ -39,5 +40,30 @@ public class CustomListView extends ListView {
 
     public boolean isReachedTop() {
         return mReachedTop;
+    }
+
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent ev) {
+        int y = (int) ev.getY();
+
+        switch (ev.getAction()) {
+            case MotionEvent.ACTION_DOWN:
+                getParent().requestDisallowInterceptTouchEvent(true);
+                break;
+            case MotionEvent.ACTION_MOVE:
+                int deltaY = y - mLastY;
+                if (mReachedTop && deltaY > 0 ||
+                        mReachedBottom && deltaY < 0) {
+                    getParent().requestDisallowInterceptTouchEvent(false);
+                }
+                break;
+            case MotionEvent.ACTION_UP:
+                break;
+            default:
+                break;
+        }
+
+        mLastY = y;
+        return super.dispatchTouchEvent(ev);
     }
 }

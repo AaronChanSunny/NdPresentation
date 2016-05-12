@@ -19,5 +19,6 @@
     <string name="title_activity_event_dispatch5">EventDispatch5Activity</string>
     <string name="title_activity_messenger">MessengerActivity</string>
     <string name="btn_say_hello">Say Hello</string>
-    <string name="title_activity_scroll_conflict">ScrollConflictActivity</string>
+    <string name="title_activity_scroll_conflict1">ScrollConflict1Activity</string>
+    <string name="title_activity_scroll_conflict2">ScrollConflict2Activity</string>
 </resources>

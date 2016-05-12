@@ -17,22 +17,22 @@ import me.aaronchan.ndpresentation.util.ActionUtil;
 /**
  * Created by Administrator on 2016/5/12.
  */
-public class CustomScrollView extends ScrollView {
+public class CustomScrollView1 extends ScrollView {
 
-    private static final String TAG = CustomScrollView.class.getSimpleName();
+    private static final String TAG = CustomScrollView1.class.getSimpleName();
 
-    private CustomListView mList;
+    private CustomListView1 mList;
     private int mLastY = 0;
 
-    public CustomScrollView(Context context, AttributeSet attrs) {
+    public CustomScrollView1(Context context, AttributeSet attrs) {
         super(context, attrs);
 
         View view = LayoutInflater.from(context)
-                .inflate(R.layout.widget_custom_scroll, null, false);
+                .inflate(R.layout.widget_custom_scroll1, null, false);
 
         addView(view);
 
-        mList = (CustomListView) view.findViewById(R.id.lv_sample);
+        mList = (CustomListView1) view.findViewById(R.id.lv_sample);
 
         ArrayAdapter<String> adapter = new ArrayAdapter<>(getContext(),
                 android.R.layout.simple_list_item_1,
@@ -41,6 +41,11 @@ public class CustomScrollView extends ScrollView {
         mList.setAdapter(adapter);
     }
 
+    /**
+     * 滑动冲突#外部拦截法
+     * @param ev
+     * @return
+     */
     @Override
     public boolean onInterceptTouchEvent(MotionEvent ev) {
         boolean intercepted =false;
