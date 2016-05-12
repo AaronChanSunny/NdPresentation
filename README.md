@@ -8,9 +8,9 @@
 
 除了上述三部分，完成线程切换的秘诀在于 `ThreadLocal`。简单的说，`ThreadLocal` 允许我们通过同一个对象在不同线程中存储不同的数据。具体到 `Android` 异步框架，就是存储每个线程的 `Looper` 对象。
 
-![](screenshots/handler-message-looper.png)
+![](images/handler-message-looper.png)
 
-![](screenshots/android-async-uml.png)
+![](images/android-async-uml.png)
 
 ### AsyncTask
 
@@ -27,7 +27,7 @@
 
 `AsyncTask#execute()` 返回的是 `AsyncTask` 引用，通过这个引用我们可以在适当时候比如在 `Activity` 的某个生命周期方法中取消这个任务，提高了异步任务的可控制性。
 
-![](screenshots/asynctask.png)
+![](images/asynctask.png)
 
 这里，我们试着解释几个结论：
 
@@ -101,7 +101,7 @@ public void run() {
 
 `IntentService` 是一个 `Service` 子类，其内部有一个工作线程用来逐一处理异步任务，当异步任务结束后 `IntentService` 会自动停止。通常情况用在应用后台数据下载。
 
-![](screenshots/intentservice.png)
+![](images/intentservice.png)
 
 当然，我们也可以直接开一个工作线程完成上述任务，`IntentService` 的优势在哪里呢？在 Andriod 中，进程按照重要程度可以分为以下5个等级：
 
@@ -221,15 +221,15 @@ public void onStart(Intent intent, int startId) {
 
 - 所有的 `View` 都没有消费事件
 
-![](screenshots/touch-ignore.jpg)
+![](images/touch-ignore.jpg)
 
 - 子 `View` 消费事件
 
-![](screenshots/touch-consumed.jpg) 
+![](images/touch-consumed.jpg) 
 
 - 父 `View` 拦截事件
 
-![](screenshots/touch-intercepted.jpg) 
+![](images/touch-intercepted.jpg) 
 
 ### 几个结论
 
@@ -301,7 +301,7 @@ public boolean superDispatchTouchEvent(MotionEvent event) {
 
 一行代码，调用了 `mDecor#superDispatchTouchEvent()` 方法。`mDecor` 就是 `DecorView`，也就是 `Window` 的顶级 `View`。可以用视图层级分析工具 [Hierarchy Viewer](http://developer.android.com/intl/zh-cn/tools/help/hierarchy-viewer.html) 进行验证：
 
-![](screenshots/decor-view.jpg)
+![](images/decor-view.jpg)
 
 `DecorView` 是 `PhoneWindow` 的一个内部类，通过定义可以看出，它继承自 `FrameLayout`，因此 `mDecor#superDispatchTouchEvent()` 方法其实调用的是 `FrameLayout#dispatchTouchEvent()` 方法。
 
@@ -657,15 +657,15 @@ private void cancelAndClearTouchTargets(MotionEvent event) {
 
 - 同时水平滑动
 
-![](screenshots/viewpager-listview.png) ![](screenshots/same-direction.png)
+![](images/viewpager-listview.png) ![](images/same-direction.png)
 
 - 一个水平滑动、一个竖直滑动
 
-![](screenshots/diff-direction.png)
+![](images/diff-direction.png)
 
 - 上述两种情况嵌套
 
-![](screenshots/with-sliding-menu.png)
+![](images/with-sliding-menu.png)
 
 解决滑动冲突的思路有两种：一种是通过重写父 `View` 的 `onInterceptTouchEvent()` 方法，让父 `View` 来决定是否要拦截事件，这种处理方式称为**外部拦截法**；另一种是父 `View` 不拦截任何事件，所有的事件都能传递给子 `View`，如果子 `View` 需要这个事件就直接消耗事件，如果不需要处理事件就把事件重新冒泡给父 `View`，这里需要配合 `ViewGroup#requestDisallowInterceptTouchEvent()` 方法。现在分别贴出两种处理方式的伪代码：
 
@@ -739,7 +739,7 @@ public boolean dispatchTouchEvent(MotionEvent ev) {
 
 ### 两个例子
 
-![](screenshots/scroll-conflict-sample1.png) ![](screenshots/scroll-conflict-sample2.png)
+![](images/scroll-conflict-sample-default.gif) ![](images/scroll-conflict-sample1.gif)
 
 ## 为什么要阅读源码
 
