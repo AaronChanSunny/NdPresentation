@@ -14,8 +14,8 @@
 
 结论：
 
-－ 通过调用 `Message.obtain()` 效率优于直接创建一个 `Message` 对象
-－ 消息处理是有优先级的，具体优先级：`message.callback.run()` > `Handler.mCallback.handleMessage(msg)` > `Handler.handleMessage(msg)`。
+- 通过调用 `Message.obtain()` 效率优于直接创建一个 `Message` 对象
+- 消息处理是有优先级的，具体优先级：`message.callback.run()` > `Handler.mCallback.handleMessage(msg)` > `Handler.handleMessage(msg)`。
 
 ### AsyncTask
 
