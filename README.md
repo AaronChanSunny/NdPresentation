@@ -312,50 +312,6 @@ public boolean superDispatchTouchEvent(MotionEvent event) {
 
 至此，事件就从 `Activity` 传递到了 `ViewGroup`。接下来，让我们分析事件在 `ViewGroup` 中的传递规则。
 
-- `View` 事件分发
-
-这里的 `View` 指的是单纯的 `View`，也就是不包含任何子 `View`。同 `Activity` 一样，`View` 的事件入口也是在 `dispatchTouchEvent()`，并且对于 `View` 来说没有拦截策略，即没有 `onInterceptTouchEvent()` 方法，对于一个事件，要么消费，要么回传给父 `View`。`View#dispatchTouchEvent()` 的关键代码如下：
-
-```
-/**
- * Pass the touch screen motion event down to the target view, or this
- * view if it is the target.
- *
- * @param event The motion event to be dispatched.
- * @return True if the event was handled by the view, false otherwise.
- */
-public boolean dispatchTouchEvent(MotionEvent event) {
-    
-    ......
-    
-    final int actionMasked = event.getActionMasked();
-    if (actionMasked == MotionEvent.ACTION_DOWN) {
-        // Defensive cleanup for new gesture
-        stopNestedScroll();
-    }
-    if (onFilterTouchEventForSecurity(event)) {
-        //noinspection SimplifiableIfStatement
-        ListenerInfo li = mListenerInfo;
-        if (li != null && li.mOnTouchListener != null
-                && (mViewFlags & ENABLED_MASK) == ENABLED
-                && li.mOnTouchListener.onTouch(this, event)) {
-            result = true;
-        }
-        if (!result && onTouchEvent(event)) {
-            result = true;
-        }
-    }
-    
-    ......
-    
-    return result;
-}
-```
-
-当 `View` 收到事件后，首先会判断是否设置了 `OnTouchListener`，如果 `OnTouchListener` 不为空，并且当前 `View` 处于可用状态（`enabled = true`），那么事件就交给 `OnTouchListener#onTouch()` 方法去处理，这个时候并不会调用 `View#onTouchEvent()` 方法。换句话说，如果对一个 `View` 设置了 `OnTouchListener`，它的优先级是比 `View#onTouchEvent()` 高的，它会拦截事件，使 `View#onTouchEvent()` 得不到执行。
-
-如果 `OnTouchListener` 为空，事件就会传递到 `View#onTouchEvent()` 方法。到此，`View` 事件分发结束。
-
 - `ViewGroup` 事件分发
 
 `ViewGroup` 的事件分发相比 `Activity` 和单纯的 `View` 都要复杂的多。`ViewGroup` 的 `ViewGroup#dispatchTouchEvent()` 方法很长，但是核心处理流程可以用如下伪代码总结：
@@ -655,6 +611,50 @@ private void cancelAndClearTouchTargets(MotionEvent event) {
     }
     
 通过这段代码可以指定，如果当前 `View` 能够执行点击事件 `performClick()` 必须满足：接收到了 `ACTION_UP` 事件并且是点击事件，并且还需要消费了 `ACTION_DOWN` 事件。这里验证了**第8条、第9条、第10条结论**。
+
+- `View` 事件分发
+
+这里的 `View` 指的是单纯的 `View`，也就是不包含任何子 `View`。同 `Activity` 一样，`View` 的事件入口也是在 `dispatchTouchEvent()`，并且对于 `View` 来说没有拦截策略，即没有 `onInterceptTouchEvent()` 方法，对于一个事件，要么消费，要么回传给父 `View`。`View#dispatchTouchEvent()` 的关键代码如下：
+
+```
+/**
+ * Pass the touch screen motion event down to the target view, or this
+ * view if it is the target.
+ *
+ * @param event The motion event to be dispatched.
+ * @return True if the event was handled by the view, false otherwise.
+ */
+public boolean dispatchTouchEvent(MotionEvent event) {
+    
+    ......
+    
+    final int actionMasked = event.getActionMasked();
+    if (actionMasked == MotionEvent.ACTION_DOWN) {
+        // Defensive cleanup for new gesture
+        stopNestedScroll();
+    }
+    if (onFilterTouchEventForSecurity(event)) {
+        //noinspection SimplifiableIfStatement
+        ListenerInfo li = mListenerInfo;
+        if (li != null && li.mOnTouchListener != null
+                && (mViewFlags & ENABLED_MASK) == ENABLED
+                && li.mOnTouchListener.onTouch(this, event)) {
+            result = true;
+        }
+        if (!result && onTouchEvent(event)) {
+            result = true;
+        }
+    }
+    
+    ......
+    
+    return result;
+}
+```
+
+当 `View` 收到事件后，首先会判断是否设置了 `OnTouchListener`，如果 `OnTouchListener` 不为空，并且当前 `View` 处于可用状态（`enabled = true`），那么事件就交给 `OnTouchListener#onTouch()` 方法去处理，这个时候并不会调用 `View#onTouchEvent()` 方法。换句话说，如果对一个 `View` 设置了 `OnTouchListener`，它的优先级是比 `View#onTouchEvent()` 高的，它会拦截事件，使 `View#onTouchEvent()` 得不到执行。
+
+如果 `OnTouchListener` 为空，事件就会传递到 `View#onTouchEvent()` 方法。到此，`View` 事件分发结束。
 
 ### 解决滑动冲突
 
