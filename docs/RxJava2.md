@@ -369,6 +369,12 @@ Observer, SingleObserver, MaybeObserver and CompletableObserver 同理。
 ### 单元测试相关
 // TODO
 
+### Demos
+
+一老外哥们写的 RxJava2 Demo：
+
+[RxJava2-Android-Samples](https://github.com/amitshekhariitbhu/RxJava2-Android-Samples)
+
 ## 小结
 
 - 引入一套新的 Observable，解决了 Backpressure 问题，并产生了大量关联的修正；
