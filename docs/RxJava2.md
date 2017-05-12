@@ -307,6 +307,10 @@ Done
 OnSubscribe end
 ```
 
+根据上面的代码的结果输出中可以看到，当我们调用 subscription.request(n) 方法的时候，不等 onSubscribe() 中后面的代码执行，就会立刻执行到 onNext 方法，因此，如果你在 onNext 方法中使用到需要初始化的类时，应当尽量在 subscription.request(n) 这个方法调用之前做好初始化的工作；当然，这也不是绝对的，我在测试的时候发现，通过 create() 自定义 Flowable 的时候，即使调用了 subscription.request(n) 方法，也会等 onSubscribe() 方法中后面的代码都执行完之后，才开始调用 onNext。
+
+> 尽可能确保在request（）之前已经完成了所有的初始化工作，否则就有空指针的风险。
+
 ### Schedulers
 - RxJava2 仍然支持：computation, io, newThread,trampoline；
 - 移除：immediate -> tranmpoline；
