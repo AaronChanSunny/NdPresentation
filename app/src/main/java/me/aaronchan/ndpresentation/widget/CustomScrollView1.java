@@ -2,9 +2,7 @@ package me.aaronchan.ndpresentation.widget;
 
 import android.content.Context;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ScrollView;
@@ -12,7 +10,6 @@ import android.widget.ScrollView;
 import java.util.Arrays;
 
 import me.aaronchan.ndpresentation.R;
-import me.aaronchan.ndpresentation.util.ActionUtil;
 
 /**
  * Created by Administrator on 2016/5/12.
@@ -46,8 +43,8 @@ public class CustomScrollView1 extends ScrollView {
      * @param ev
      * @return
      */
-    @Override
-    public boolean onInterceptTouchEvent(MotionEvent ev) {
+    //@Override
+   /* public boolean onInterceptTouchEvent(MotionEvent ev) {
         boolean intercepted =false;
 
         int y = (int) ev.getY();
@@ -79,6 +76,6 @@ public class CustomScrollView1 extends ScrollView {
         super.onInterceptTouchEvent(ev);
 
         return intercepted;
-    }
+    }*/
 
 }
