@@ -97,7 +97,7 @@ Observable.just(1).toCompletable()
 #### Maybe
 Maybe 可能出现无数据或只有一个数据的情况，所以 onSuccess() 和 onComplete() 只会调用其中一个。可以理解成是 Single 和 Completable 的结合体。适用于可能发射 1 个或者 0 个的数据源。
 
-### 响应式接口
+### 被观察者新成员
 
 与 Reactive-Streams 中 Flowable extends Publisher<T> 风格一样，其他基本响应类也有类似的基础接口：
 
