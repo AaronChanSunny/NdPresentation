@@ -8,7 +8,7 @@
 - 2017.7.1－－不再支持新特性兼容，只修复遗留 BUG；
 - 2018.3.31－－不再开发与维护。
 
-> [Backpressure](https://github.com/ReactiveX/RxJava/wiki/Backpressure)
+> [Backpressure](https://zhuanlan.zhihu.com/p/24473022?refer=dreawer)
 
 ![](../extra/QQ20170511-0@2x.png)
 
@@ -45,6 +45,8 @@ Observable.just(1).map(v -> null)
 
 - Observable 会将没有消费的数据保存在内存中直到 OutOfMemoryError 而不会抛出 MissBackpressureException；
 - Flowable 支持背压，可以在 Flowable.create() 创建时指定背压策略。如：BackpressureStrategy.DROP。
+
+![](../extra/v2-b6a6da8d2b90129984268ff5db4e9ebb_r.png)
 
 #### 使用场景
 
@@ -376,3 +378,5 @@ Observer, SingleObserver, MaybeObserver and CompletableObserver 同理。
 ## 参考
 - [What's different in 2.0](https://github.com/ReactiveX/RxJava/wiki/What's-different-in-2.0)
 - [Backpressure](https://github.com/ReactiveX/RxJava/wiki/Backpressure)
+- [关于RxJava最友好的文章——背压（Backpressure）](https://zhuanlan.zhihu.com/p/24473022?refer=dreawer)
+- [关于 RxJava 最友好的文章—— RxJava 2.0 全新来袭](https://zhuanlan.zhihu.com/p/24482660)
